@@ -1,0 +1,20 @@
+{
+    "name": "Exanite.SceneManagement",
+    "rootNamespace": "",
+    "references": [
+        "Exanite.Core",
+        "UniTask",
+        "UniDi.UniDi"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "UniDi-Usage.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
