@@ -4,7 +4,7 @@ using UniDi;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Project.Source.SceneManagement
+namespace Exanite.SceneManagement
 {
     /// <summary>
     ///     Used to load scenes
@@ -19,7 +19,7 @@ namespace Project.Source.SceneManagement
 
         private int internalLoadingCount;
         private bool internalIsLoading;
-        
+
         [Inject] private SceneContextRegistry sceneContextRegistry;
 
         public bool IsLoading => internalLoadingCount != 0;

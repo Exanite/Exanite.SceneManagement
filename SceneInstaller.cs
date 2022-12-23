@@ -3,7 +3,7 @@ using UniDi;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Project.Source.SceneManagement
+namespace Exanite.SceneManagement
 {
     /// <summary>
     ///     Installs the <see cref="Scene"/> and <see cref="PhysicsScene"/>

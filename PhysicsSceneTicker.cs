@@ -1,7 +1,7 @@
 using UniDi;
 using UnityEngine;
 
-namespace Project.Source.SceneManagement
+namespace Exanite.SceneManagement
 {
     [DefaultExecutionOrder(-50)]
     public class PhysicsSceneTicker : MonoBehaviour
