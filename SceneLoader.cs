@@ -7,11 +7,12 @@ using UnityEngine.SceneManagement;
 namespace Exanite.SceneManagement
 {
     /// <summary>
-    ///     Used to load scenes
+    ///     Used to load scenes and create DI container parent-child
+    ///     relations.
     ///     <para/>
     ///     Note: Only use this class to load scenes, directly loading with
     ///     <see cref="SceneManager"/> will bypass UniDi bindings and
-    ///     container parenting
+    ///     container parenting.
     /// </summary>
     public class SceneLoader : MonoBehaviour
     {
@@ -26,20 +27,20 @@ namespace Exanite.SceneManagement
 
         /// <summary>
         ///     Loads the <see cref="Scene"/> using the provided
-        ///     <see cref="Scene"/> as its parent
+        ///     <see cref="Scene"/> as its parent.
         /// </summary>
         /// <param name="sceneName">
-        ///     The name of the <see cref="Scene"/> to load
+        ///     The name of the <see cref="Scene"/> to load.
         /// </param>
         /// <param name="parent">
-        ///     The parent of the new <see cref="Scene"/>
+        ///     The parent of the new <see cref="Scene"/>.
         /// </param>
         /// <param name="bindings">
-        ///     Bindings to install to the <see cref="DiContainer"/>
+        ///     Bindings to install to the <see cref="DiContainer"/>.
         /// </param>
         /// <param name="bindingsLate">
         ///     Late bindings to install to the <see cref="DiContainer"/>, these
-        ///     are installed after all other bindings are installed
+        ///     are installed after all other bindings are installed.
         /// </param>
         /// <returns>
         ///     The newly loaded <see cref="Scene"/>
@@ -58,23 +59,23 @@ namespace Exanite.SceneManagement
 
         /// <summary>
         ///     Loads the <see cref="Scene"/> using the provided
-        ///     <see cref="SceneContext"/> as its parent
+        ///     <see cref="SceneContext"/> as its parent.
         /// </summary>
         /// <param name="sceneName">
-        ///     The name of the <see cref="Scene"/> to load
+        ///     The name of the <see cref="Scene"/> to load.
         /// </param>
         /// <param name="parent">
-        ///     The parent of the new <see cref="Scene"/>
+        ///     The parent of the new <see cref="Scene"/>.
         /// </param>
         /// <param name="bindings">
-        ///     Bindings to install to the <see cref="DiContainer"/>
+        ///     Bindings to install to the <see cref="DiContainer"/>.
         /// </param>
         /// <param name="bindingsLate">
         ///     Late bindings to install to the <see cref="DiContainer"/>, these
-        ///     are installed after all other bindings are installed
+        ///     are installed after all other bindings are installed.
         /// </param>
         /// <returns>
-        ///     The newly loaded <see cref="Scene"/>
+        ///     The newly loaded <see cref="Scene"/>.
         /// </returns>
         public async UniTask<Scene> LoadAdditiveScene(
             string sceneName,
@@ -100,6 +101,7 @@ namespace Exanite.SceneManagement
             try
             {
                 var loadSceneParameters = new LoadSceneParameters(LoadSceneMode.Additive, localPhysicsMode);
+
                 return await LoadScene(sceneName, loadSceneParameters);
             }
             finally
@@ -110,20 +112,20 @@ namespace Exanite.SceneManagement
         }
 
         /// <summary>
-        ///     Loads the <see cref="Scene"/> while unloading all other scenes
+        ///     Loads the <see cref="Scene"/> while unloading all other scenes.
         /// </summary>
         /// <param name="sceneName">
-        ///     The name of the <see cref="Scene"/> to load
+        ///     The name of the <see cref="Scene"/> to load.
         /// </param>
         /// <param name="bindings">
-        ///     Bindings to install to the <see cref="DiContainer"/>
+        ///     Bindings to install to the <see cref="DiContainer"/>.
         /// </param>
         /// <param name="bindingsLate">
         ///     Late bindings to install to the <see cref="DiContainer"/>, these
-        ///     are installed after all other bindings are installed
+        ///     are installed after all other bindings are installed.
         /// </param>
         /// <returns>
-        ///     The newly loaded <see cref="Scene"/>
+        ///     The newly loaded <see cref="Scene"/>.
         /// </returns>
         public async UniTask<Scene> LoadSingleScene(
             string sceneName,
@@ -143,6 +145,7 @@ namespace Exanite.SceneManagement
             try
             {
                 var loadSceneParameters = new LoadSceneParameters(LoadSceneMode.Single, localPhysicsMode);
+
                 return await LoadScene(sceneName, loadSceneParameters);
             }
             finally
@@ -168,6 +171,9 @@ namespace Exanite.SceneManagement
             await SceneManager.UnloadSceneAsync(scene);
         }
 
+        /// <summary>
+        ///     Used to ensure only one scene load operation happens at a time.
+        /// </summary>
         private async UniTask AcquireLock()
         {
             internalLoadingCount++;
@@ -175,6 +181,9 @@ namespace Exanite.SceneManagement
             internalIsLoading = true;
         }
 
+        /// <summary>
+        ///     Used to ensure only one scene load operation happens at a time.
+        /// </summary>
         private void ReleaseLock()
         {
             internalIsLoading = false;
@@ -195,8 +204,8 @@ namespace Exanite.SceneManagement
         }
 
         /// <summary>
-        ///     Prepares the next scene loaded to use the provided parent and
-        ///     bindings
+        ///     Configures the next scene loaded to use the provided parent and
+        ///     bindings.
         /// </summary>
         private static void PrepareSceneLoad(SceneContext parent, Action<DiContainer> bindings, Action<DiContainer> bindingsLate)
         {
