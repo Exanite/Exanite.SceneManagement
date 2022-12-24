@@ -88,15 +88,12 @@ namespace Exanite.SceneManagement
                 throw new ArgumentException($"Failed to load scene. Specified scene '{sceneName}' does not exist.", nameof(sceneName));
             }
 
+            await AcquireLock();
+
             bindings += container =>
             {
                 container.Bind<Scene>().WithId(ParentSceneId).To<Scene>().FromInstance(parent.gameObject.scene);
             };
-
-            // Allow only one scene to load at a time
-            internalLoadingCount++;
-            await UniTask.WaitWhile(() => internalIsLoading);
-            internalIsLoading = true;
 
             PrepareSceneLoad(parent, bindings, bindingsLate);
 
@@ -107,11 +104,8 @@ namespace Exanite.SceneManagement
             }
             finally
             {
-                // Prevent dead lock
-                internalIsLoading = false;
-                internalLoadingCount--;
-
                 CleanupSceneLoad();
+                ReleaseLock();
             }
         }
 
@@ -142,10 +136,7 @@ namespace Exanite.SceneManagement
                 throw new ArgumentException($"Failed to load scene. Specified scene '{sceneName}' does not exist.", nameof(sceneName));
             }
 
-            // Allow only one scene to load at a time
-            internalLoadingCount++;
-            await UniTask.WaitWhile(() => internalIsLoading);
-            internalIsLoading = true;
+            await AcquireLock();
 
             PrepareSceneLoad(null, bindings, bindingsLate);
 
@@ -156,11 +147,8 @@ namespace Exanite.SceneManagement
             }
             finally
             {
-                // Prevent dead lock
-                internalIsLoading = false;
-                internalLoadingCount--;
-
                 CleanupSceneLoad();
+                ReleaseLock();
             }
         }
 
@@ -178,6 +166,19 @@ namespace Exanite.SceneManagement
             }
 
             await SceneManager.UnloadSceneAsync(scene);
+        }
+
+        private async UniTask AcquireLock()
+        {
+            internalLoadingCount++;
+            await UniTask.WaitWhile(() => internalIsLoading);
+            internalIsLoading = true;
+        }
+
+        private void ReleaseLock()
+        {
+            internalIsLoading = false;
+            internalLoadingCount--;
         }
 
         private async UniTask<Scene> LoadScene(string sceneName, LoadSceneParameters loadSceneParameters)
