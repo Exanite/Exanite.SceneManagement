@@ -98,20 +98,12 @@ namespace Exanite.SceneManagement
             await UniTask.WaitWhile(() => internalIsLoading);
             internalIsLoading = true;
 
-            PrepareForSceneLoad(parent, bindings, bindingsLate);
+            PrepareSceneLoad(parent, bindings, bindingsLate);
 
             try
             {
                 var loadSceneParameters = new LoadSceneParameters(LoadSceneMode.Additive, localPhysicsMode);
-                await SceneManager.LoadSceneAsync(sceneName, loadSceneParameters);
-
-                // LoadSceneAsync does not return the newly loaded scene, this is the only way to get the new scene
-                var scene = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
-
-                // Wait for scene to initialize
-                await UniTask.Yield();
-
-                return scene;
+                return await LoadScene(sceneName, loadSceneParameters);
             }
             finally
             {
@@ -119,7 +111,7 @@ namespace Exanite.SceneManagement
                 internalIsLoading = false;
                 internalLoadingCount--;
 
-                Cleanup();
+                CleanupSceneLoad();
             }
         }
 
@@ -155,20 +147,12 @@ namespace Exanite.SceneManagement
             await UniTask.WaitWhile(() => internalIsLoading);
             internalIsLoading = true;
 
-            PrepareForSceneLoad(null, bindings, bindingsLate);
+            PrepareSceneLoad(null, bindings, bindingsLate);
 
             try
             {
                 var loadSceneParameters = new LoadSceneParameters(LoadSceneMode.Single, localPhysicsMode);
-                await SceneManager.LoadSceneAsync(sceneName, loadSceneParameters);
-
-                // LoadSceneAsync does not return the newly loaded scene, this is the only way to get the new scene
-                var scene = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
-
-                // Wait for scene to initialize
-                await UniTask.Yield();
-
-                return scene;
+                return await LoadScene(sceneName, loadSceneParameters);
             }
             finally
             {
@@ -176,7 +160,7 @@ namespace Exanite.SceneManagement
                 internalIsLoading = false;
                 internalLoadingCount--;
 
-                Cleanup();
+                CleanupSceneLoad();
             }
         }
 
@@ -196,11 +180,24 @@ namespace Exanite.SceneManagement
             await SceneManager.UnloadSceneAsync(scene);
         }
 
+        private async UniTask<Scene> LoadScene(string sceneName, LoadSceneParameters loadSceneParameters)
+        {
+            await SceneManager.LoadSceneAsync(sceneName, loadSceneParameters);
+
+            // LoadSceneAsync does not return the newly loaded scene, this is the only way to get the new scene
+            var scene = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
+
+            // Wait for scene to initialize
+            await UniTask.Yield();
+
+            return scene;
+        }
+
         /// <summary>
         ///     Prepares the next scene loaded to use the provided parent and
         ///     bindings
         /// </summary>
-        private void PrepareForSceneLoad(SceneContext parent, Action<DiContainer> bindings, Action<DiContainer> bindingsLate)
+        private static void PrepareSceneLoad(SceneContext parent, Action<DiContainer> bindings, Action<DiContainer> bindingsLate)
         {
             SceneContext.ParentContainers = parent == null ? null : new[] { parent.Container };
 
@@ -208,7 +205,7 @@ namespace Exanite.SceneManagement
             SceneContext.ExtraBindingsLateInstallMethod = bindingsLate;
         }
 
-        private void Cleanup()
+        private static void CleanupSceneLoad()
         {
             SceneContext.ParentContainers = null;
 
