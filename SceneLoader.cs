@@ -106,8 +106,8 @@ namespace Exanite.SceneManagement
             }
             finally
             {
-                CleanupSceneLoad();
                 ReleaseLock();
+                CleanupSceneLoad();
             }
         }
 
@@ -150,8 +150,8 @@ namespace Exanite.SceneManagement
             }
             finally
             {
-                CleanupSceneLoad();
                 ReleaseLock();
+                CleanupSceneLoad();
             }
         }
 
