@@ -47,8 +47,8 @@ namespace Exanite.SceneManagement
         /// </returns>
         public UniTask<Scene> LoadAdditiveScene(
             string sceneName,
-            Scene parent,
-            LocalPhysicsMode localPhysicsMode,
+            Scene parent = default,
+            LocalPhysicsMode localPhysicsMode = LocalPhysicsMode.None,
             Action<DiContainer> bindings = null,
             Action<DiContainer> bindingsLate = null)
         {
@@ -79,8 +79,8 @@ namespace Exanite.SceneManagement
         /// </returns>
         public async UniTask<Scene> LoadAdditiveScene(
             string sceneName,
-            SceneContext parent,
-            LocalPhysicsMode localPhysicsMode,
+            SceneContext parent = null,
+            LocalPhysicsMode localPhysicsMode = LocalPhysicsMode.None,
             Action<DiContainer> bindings = null,
             Action<DiContainer> bindingsLate = null)
         {
@@ -129,7 +129,7 @@ namespace Exanite.SceneManagement
         /// </returns>
         public async UniTask<Scene> LoadSingleScene(
             string sceneName,
-            LocalPhysicsMode localPhysicsMode,
+            LocalPhysicsMode localPhysicsMode = LocalPhysicsMode.None,
             Action<DiContainer> bindings = null,
             Action<DiContainer> bindingsLate = null)
         {
