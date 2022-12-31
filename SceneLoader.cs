@@ -93,7 +93,10 @@ namespace Exanite.SceneManagement
 
             bindings += container =>
             {
-                container.Bind<Scene>().WithId(ParentSceneId).To<Scene>().FromInstance(parent.gameObject.scene);
+                if (parent != null)
+                {
+                    container.Bind<Scene>().WithId(ParentSceneId).To<Scene>().FromInstance(parent.gameObject.scene);
+                }
             };
 
             PrepareSceneLoad(parent, bindings, bindingsLate);
