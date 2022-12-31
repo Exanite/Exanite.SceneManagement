@@ -35,6 +35,9 @@ namespace Exanite.SceneManagement
         /// <param name="parent">
         ///     The parent of the new <see cref="Scene"/>.
         /// </param>
+        /// <param name="localPhysicsMode">
+        ///     Should this scene have its own physics simulation?
+        /// </param>
         /// <param name="bindings">
         ///     Bindings to install to the <see cref="DiContainer"/>.
         /// </param>
@@ -66,6 +69,9 @@ namespace Exanite.SceneManagement
         /// </param>
         /// <param name="parent">
         ///     The parent of the new <see cref="Scene"/>.
+        /// </param>
+        /// <param name="localPhysicsMode">
+        ///     Should this scene have its own physics simulation?
         /// </param>
         /// <param name="bindings">
         ///     Bindings to install to the <see cref="DiContainer"/>.
@@ -119,6 +125,9 @@ namespace Exanite.SceneManagement
         /// </summary>
         /// <param name="sceneName">
         ///     The name of the <see cref="Scene"/> to load.
+        /// </param>
+        /// <param name="localPhysicsMode">
+        ///     Should this scene have its own physics simulation?
         /// </param>
         /// <param name="bindings">
         ///     Bindings to install to the <see cref="DiContainer"/>.
