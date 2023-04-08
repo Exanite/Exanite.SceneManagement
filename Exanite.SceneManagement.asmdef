@@ -1,6 +1,5 @@
 {
     "name": "Exanite.SceneManagement",
-    "rootNamespace": "",
     "references": [
         "Exanite.Core",
         "UniTask",
