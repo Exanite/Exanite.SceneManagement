@@ -7,17 +7,19 @@ using UnityEngine.SceneManagement;
 namespace Exanite.SceneManagement
 {
     /// <summary>
-    ///     Used to load scenes and create DI container parent-child
-    ///     relations.
-    ///     <para/>
-    ///     Note: Only use this class to load scenes, directly loading with
-    ///     <see cref="SceneManager"/> will bypass UniDi bindings and
-    ///     container parenting.
+    /// Used to load scenes and create DI container parent-child relations.
+    /// <para/>
+    /// Note: Only use this class to load scenes, directly loading with
+    /// <see cref="SceneManager"/> will bypass UniDi bindings and
+    /// container parenting.
     /// </summary>
     public class SceneLoadManager : MonoBehaviour
     {
         public const string ParentSceneId = "ParentScene";
 
+        /// <summary>
+        /// Ensures only one scene load operation happens at a time.
+        /// </summary>
         private static UniTaskMonitor SceneLoadMonitor { get; } = new();
 
         [Inject] private SceneContextRegistry sceneContextRegistry;
@@ -25,27 +27,26 @@ namespace Exanite.SceneManagement
         public static bool IsLoading => SceneLoadMonitor.HasPending;
 
         /// <summary>
-        ///     Loads the <see cref="Scene"/> using the provided
-        ///     <see cref="Scene"/> as its parent.
+        /// Loads the <see cref="Scene"/> using the provided <see cref="Scene"/> as its parent.
         /// </summary>
         /// <param name="sceneName">
-        ///     The name of the <see cref="Scene"/> to load.
+        /// The name of the <see cref="Scene"/> to load.
         /// </param>
         /// <param name="parent">
-        ///     The parent of the new <see cref="Scene"/>.
+        /// The parent of the new <see cref="Scene"/>.
         /// </param>
         /// <param name="localPhysicsMode">
-        ///     Should this scene have its own physics simulation?
+        /// Should this scene have its own physics simulation?
         /// </param>
         /// <param name="bindings">
-        ///     Bindings to install to the <see cref="DiContainer"/>.
+        /// Bindings to install to the <see cref="DiContainer"/>.
         /// </param>
         /// <param name="bindingsLate">
-        ///     Late bindings to install to the <see cref="DiContainer"/>, these
-        ///     are installed after all other bindings are installed.
+        /// Late bindings to install to the <see cref="DiContainer"/>, these
+        /// are installed after all other bindings are installed.
         /// </param>
         /// <returns>
-        ///     The newly loaded <see cref="Scene"/>
+        /// The newly loaded <see cref="Scene"/>
         /// </returns>
         public UniTask<Scene> LoadAdditiveScene(
             string sceneName,
@@ -60,27 +61,27 @@ namespace Exanite.SceneManagement
         }
 
         /// <summary>
-        ///     Loads the <see cref="Scene"/> using the provided
-        ///     <see cref="SceneContext"/> as its parent.
+        /// Loads the <see cref="Scene"/> using the provided
+        /// <see cref="SceneContext"/> as its parent.
         /// </summary>
         /// <param name="sceneName">
-        ///     The name of the <see cref="Scene"/> to load.
+        /// The name of the <see cref="Scene"/> to load.
         /// </param>
         /// <param name="parent">
-        ///     The parent of the new <see cref="Scene"/>.
+        /// The parent of the new <see cref="Scene"/>.
         /// </param>
         /// <param name="localPhysicsMode">
-        ///     Should this scene have its own physics simulation?
+        /// Should this scene have its own physics simulation?
         /// </param>
         /// <param name="bindings">
-        ///     Bindings to install to the <see cref="DiContainer"/>.
+        /// Bindings to install to the <see cref="DiContainer"/>.
         /// </param>
         /// <param name="bindingsLate">
-        ///     Late bindings to install to the <see cref="DiContainer"/>, these
-        ///     are installed after all other bindings are installed.
+        /// Late bindings to install to the <see cref="DiContainer"/>, these
+        /// are installed after all other bindings are installed.
         /// </param>
         /// <returns>
-        ///     The newly loaded <see cref="Scene"/>.
+        /// The newly loaded <see cref="Scene"/>.
         /// </returns>
         public async UniTask<Scene> LoadAdditiveScene(
             string sceneName,
@@ -94,20 +95,20 @@ namespace Exanite.SceneManagement
                 throw new ArgumentException($"Failed to load scene. Specified scene '{sceneName}' does not exist.", nameof(sceneName));
             }
 
-            await SceneLoadMonitor.AcquireLock();
-
-            bindings += container =>
-            {
-                if (parent != null)
-                {
-                    container.Bind<Scene>().WithId(ParentSceneId).To<Scene>().FromInstance(parent.gameObject.scene);
-                }
-            };
-
-            PrepareSceneLoad(parent, bindings, bindingsLate);
-
             try
             {
+                await SceneLoadMonitor.AcquireLock();
+
+                bindings += container =>
+                {
+                    if (parent != null)
+                    {
+                        container.Bind<Scene>().WithId(ParentSceneId).To<Scene>().FromInstance(parent.gameObject.scene);
+                    }
+                };
+
+                PrepareSceneLoad(parent, bindings, bindingsLate);
+
                 var loadSceneParameters = new LoadSceneParameters(LoadSceneMode.Additive, localPhysicsMode);
 
                 return await LoadScene(sceneName, loadSceneParameters);
@@ -120,23 +121,23 @@ namespace Exanite.SceneManagement
         }
 
         /// <summary>
-        ///     Loads the <see cref="Scene"/> while unloading all other scenes.
+        /// Loads the <see cref="Scene"/> while unloading all other scenes.
         /// </summary>
         /// <param name="sceneName">
-        ///     The name of the <see cref="Scene"/> to load.
+        /// The name of the <see cref="Scene"/> to load.
         /// </param>
         /// <param name="localPhysicsMode">
-        ///     Should this scene have its own physics simulation?
+        /// Should this scene have its own physics simulation?
         /// </param>
         /// <param name="bindings">
-        ///     Bindings to install to the <see cref="DiContainer"/>.
+        /// Bindings to install to the <see cref="DiContainer"/>.
         /// </param>
         /// <param name="bindingsLate">
-        ///     Late bindings to install to the <see cref="DiContainer"/>, these
-        ///     are installed after all other bindings are installed.
+        /// Late bindings to install to the <see cref="DiContainer"/>, these
+        /// are installed after all other bindings are installed.
         /// </param>
         /// <returns>
-        ///     The newly loaded <see cref="Scene"/>.
+        /// The newly loaded <see cref="Scene"/>.
         /// </returns>
         public async UniTask<Scene> LoadSingleScene(
             string sceneName,
@@ -149,12 +150,12 @@ namespace Exanite.SceneManagement
                 throw new ArgumentException($"Failed to load scene. Specified scene '{sceneName}' does not exist.", nameof(sceneName));
             }
 
-            await SceneLoadMonitor.AcquireLock();
-
-            PrepareSceneLoad(null, bindings, bindingsLate);
-
             try
             {
+                await SceneLoadMonitor.AcquireLock();
+
+                PrepareSceneLoad(null, bindings, bindingsLate);
+
                 var loadSceneParameters = new LoadSceneParameters(LoadSceneMode.Single, localPhysicsMode);
 
                 return await LoadScene(sceneName, loadSceneParameters);
