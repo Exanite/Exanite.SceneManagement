@@ -1,10 +1,11 @@
 using Cysharp.Threading.Tasks;
+using UniDi;
 using UnityEngine;
 
 namespace Exanite.SceneManagement
 {
     public abstract class SceneLoadStage : MonoBehaviour
     {
-        public abstract UniTask Load();
+        public abstract UniTask Load(DiContainer container);
     }
 }

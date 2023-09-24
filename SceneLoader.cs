@@ -41,9 +41,12 @@ namespace Exanite.SceneManagement
 
         private async UniTask LoadScene()
         {
+            ProjectContext.Instance.EnsureIsInitialized();
+            var container = ProjectContext.Instance.Container;
+
             foreach (var stage in stages)
             {
-                await stage.Load();
+                await stage.Load(container);
             }
         }
 
