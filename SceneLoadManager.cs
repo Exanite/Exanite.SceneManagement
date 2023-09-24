@@ -179,26 +179,6 @@ namespace Exanite.SceneManagement
             await SceneManager.UnloadSceneAsync(scene);
         }
 
-        private async UniTask<Scene> LoadScene(string sceneName, LoadSceneParameters loadSceneParameters)
-        {
-            try
-            {
-                await SceneLoadMonitors.Activation.AcquireLock();
-
-                await SceneManager.LoadSceneAsync(sceneName, loadSceneParameters);
-
-                // Wait for scene to initialize
-                await UniTask.Yield();
-            }
-            finally
-            {
-                SceneLoadMonitors.Activation.ReleaseLock();
-            }
-
-            // LoadSceneAsync does not return the newly loaded scene, this is the only way to get the new scene
-            return SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
-        }
-
         /// <summary>
         /// Configures the next <see cref="SceneContext"/> activated to use the provided parent containers and bindings.
         /// </summary>
@@ -219,6 +199,26 @@ namespace Exanite.SceneManagement
 
             SceneContext.ExtraBindingsInstallMethod = null;
             SceneContext.ExtraBindingsLateInstallMethod = null;
+        }
+
+        private async UniTask<Scene> LoadScene(string sceneName, LoadSceneParameters loadSceneParameters)
+        {
+            try
+            {
+                await SceneLoadMonitors.Activation.AcquireLock();
+
+                await SceneManager.LoadSceneAsync(sceneName, loadSceneParameters);
+
+                // Wait for scene to initialize
+                await UniTask.Yield();
+            }
+            finally
+            {
+                SceneLoadMonitors.Activation.ReleaseLock();
+            }
+
+            // LoadSceneAsync does not return the newly loaded scene, this is the only way to get the new scene
+            return SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
         }
     }
 }
