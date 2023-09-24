@@ -100,7 +100,7 @@ namespace Exanite.SceneManagement
             SceneLoaderRegistry.Register(gameObject.scene, this);
 
             IsLoading = true;
-
+            HasActivatedScene = false;
             DisableSceneObjects();
 
             ProjectContext.Instance.EnsureIsInitialized();

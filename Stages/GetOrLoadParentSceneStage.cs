@@ -42,8 +42,6 @@ namespace Exanite.SceneManagement.Stages
             var parentScene = await parentSceneIdentifier.Load(sceneLoader, container);
             var parentSceneLoader = SceneLoaderRegistry.SceneLoaders[parentScene];
 
-            await UniTask.WaitWhile(() => parentSceneLoader.IsLoading);
-
             return parentSceneLoader;
         }
     }
