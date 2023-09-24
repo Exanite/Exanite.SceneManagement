@@ -6,6 +6,6 @@ namespace Exanite.SceneManagement
 {
     public abstract class SceneLoadStage : MonoBehaviour
     {
-        public abstract UniTask Load(DiContainer container);
+        public abstract UniTask Load(SceneLoader sceneLoader, DiContainer container);
     }
 }
