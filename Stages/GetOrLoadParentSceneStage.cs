@@ -11,10 +11,8 @@ namespace Exanite.SceneManagement.Stages
 
         public override async UniTask Load(SceneLoader sceneLoader, DiContainer container)
         {
-            var parentScene = GetOrLoadParentScene(sceneLoader, container);
-
-            // Todo Set parent container right before activation
-            // Likely needs lock to prevent race conditions
+            var parentScene = await GetOrLoadParentScene(sceneLoader, container);
+            sceneLoader.AddParentSceneLoader(parentScene);
         }
 
         private async UniTask<SceneLoader> GetOrLoadParentScene(SceneLoader sceneLoader, DiContainer container)

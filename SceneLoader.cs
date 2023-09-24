@@ -17,8 +17,6 @@ namespace Exanite.SceneManagement
         [Required]
         [SerializeField] private SceneContext sceneContext;
         [SerializeField] private List<SceneLoadStage> stages = new();
-        [Space]
-        [SerializeField] private bool disableSceneObjectsDuringLoad = true;
 
         /// <summary>
         /// Stores all of the original objects in the scene while resources are being loaded.
@@ -31,6 +29,9 @@ namespace Exanite.SceneManagement
         private Transform sceneObjectsParent;
 
         private List<UniTask> pendingTasks = new();
+
+        private List<SceneLoader> parentSceneLoaders = new();
+        private List<SceneLoader> pendingParentSceneLoaders = new();
 
         public SceneIdentifier Identifier
         {
@@ -46,13 +47,17 @@ namespace Exanite.SceneManagement
 
         public List<SceneLoadStage> Stages => stages;
 
-        public bool DisableSceneObjectsDuringLoad
-        {
-            get => disableSceneObjectsDuringLoad;
-            set => disableSceneObjectsDuringLoad = value;
-        }
-
+        /// <summary>
+        /// Is the SceneLoader loading the scene?
+        /// </summary>
         public bool IsLoading { get; private set; }
+
+        /// <summary>
+        /// Has the objects in this SceneLoader's scene been activated?
+        /// <para/>
+        /// This is part of the loading phase.
+        /// </summary>
+        public bool HasActivatedScene { get; private set; }
 
         private void Awake()
         {
@@ -67,6 +72,17 @@ namespace Exanite.SceneManagement
         private void OnDisable()
         {
             SceneLoaderRegistry.Unregister(gameObject.scene);
+        }
+
+        public void AddParentSceneLoader(SceneLoader parentSceneLoader)
+        {
+            if (HasActivatedScene)
+            {
+                throw new InvalidOperationException($"Can only add parent scenes before the scene has been activated.");
+            }
+
+            parentSceneLoaders.Add(parentSceneLoader);
+            pendingParentSceneLoaders.Add(parentSceneLoader);
         }
 
         public void AddPendingTask(UniTask task)
@@ -85,10 +101,7 @@ namespace Exanite.SceneManagement
 
             IsLoading = true;
 
-            if (DisableSceneObjectsDuringLoad)
-            {
-                DisableSceneObjects();
-            }
+            DisableSceneObjects();
 
             ProjectContext.Instance.EnsureIsInitialized();
             var container = ProjectContext.Instance.Container;
@@ -98,7 +111,15 @@ namespace Exanite.SceneManagement
                 await stage.Load(this, container);
             }
 
-            RestoreDisabledSceneObjects();
+            while (pendingParentSceneLoaders.Count > 0)
+            {
+                pendingParentSceneLoaders.RemoveAll(parent => !parent.IsLoading);
+
+                await UniTask.Yield();
+            }
+
+            HasActivatedScene = true;
+            ActivateSceneObjects();
 
             // Wait 3 frames (arbitrary number) for any additional load tasks added by activated scene objects
             for (var i = 0; i < 3; i++)
@@ -127,6 +148,7 @@ namespace Exanite.SceneManagement
 
                 sceneObjectsParent = new GameObject($"Scene Objects (Created by {GetType().Name})").transform;
                 sceneObjectsParent.gameObject.SetActive(false);
+                SceneManager.MoveGameObjectToScene(sceneObjectsParent.gameObject, gameObject.scene);
 
                 foreach (var rootGameObject in rootGameObjects)
                 {
@@ -138,7 +160,7 @@ namespace Exanite.SceneManagement
             }
         }
 
-        private void RestoreDisabledSceneObjects()
+        private void ActivateSceneObjects()
         {
             if (sceneObjectsParent == null)
             {
