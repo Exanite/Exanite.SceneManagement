@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UniDi;
@@ -128,7 +129,11 @@ namespace Exanite.SceneManagement
                 await SceneActivationMonitor.AcquireLock();
 
                 HasActivatedScene = true;
+
+                var parentContainers = parentSceneLoaders.Select(loader => loader.SceneContext.Container).ToList();
+                SceneLoadManager.SetSceneContextParameters(parentContainers.Count == 0 ? null : parentContainers);
                 ActivateSceneObjects();
+                SceneLoadManager.CleanupSceneContextParameters();
             }
             finally
             {

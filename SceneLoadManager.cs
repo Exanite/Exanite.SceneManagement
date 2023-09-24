@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UniDi;
 using UnityEngine;
@@ -107,7 +108,7 @@ namespace Exanite.SceneManagement
                     }
                 };
 
-                PrepareSceneLoad(parent, bindings, bindingsLate);
+                SetSceneContextParameters(parent == null ? null : new[] { parent.Container }, bindings, bindingsLate);
 
                 var loadSceneParameters = new LoadSceneParameters(LoadSceneMode.Additive, localPhysicsMode);
 
@@ -116,7 +117,7 @@ namespace Exanite.SceneManagement
             finally
             {
                 SceneLoadMonitor.ReleaseLock();
-                CleanupSceneLoad();
+                CleanupSceneContextParameters();
             }
         }
 
@@ -154,7 +155,7 @@ namespace Exanite.SceneManagement
             {
                 await SceneLoadMonitor.AcquireLock();
 
-                PrepareSceneLoad(null, bindings, bindingsLate);
+                SetSceneContextParameters(null, bindings, bindingsLate);
 
                 var loadSceneParameters = new LoadSceneParameters(LoadSceneMode.Single, localPhysicsMode);
 
@@ -163,7 +164,7 @@ namespace Exanite.SceneManagement
             finally
             {
                 SceneLoadMonitor.ReleaseLock();
-                CleanupSceneLoad();
+                CleanupSceneContextParameters();
             }
         }
 
@@ -197,17 +198,20 @@ namespace Exanite.SceneManagement
         }
 
         /// <summary>
-        /// Configures the next scene loaded to use the provided parent and bindings.
+        /// Configures the next <see cref="SceneContext"/> activated to use the provided parent containers and bindings.
         /// </summary>
-        private static void PrepareSceneLoad(SceneContext parent, Action<DiContainer> bindings, Action<DiContainer> bindingsLate)
+        public static void SetSceneContextParameters(IEnumerable<DiContainer> parentContainers = null, Action<DiContainer> bindings = null, Action<DiContainer> bindingsLate = null)
         {
-            SceneContext.ParentContainers = parent == null ? null : new[] { parent.Container };
+            SceneContext.ParentContainers = parentContainers;
 
             SceneContext.ExtraBindingsInstallMethod = bindings;
             SceneContext.ExtraBindingsLateInstallMethod = bindingsLate;
         }
 
-        private static void CleanupSceneLoad()
+        /// <summary>
+        /// Cleans up parameters set in <see cref="SetSceneContextParameters"/>.
+        /// </summary>
+        public static void CleanupSceneContextParameters()
         {
             SceneContext.ParentContainers = null;
 
