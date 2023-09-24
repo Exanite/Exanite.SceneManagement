@@ -155,7 +155,6 @@ MonoBehaviour:
   identifier: {fileID: 11400000, guid: 8d2fc8c73e493684c8accd6ded648097, type: 2}
   sceneContext: {fileID: 348264147}
   stages: []
-  disableSceneObjectsDuringLoad: 1
 --- !u!4 &9697877
 Transform:
   m_ObjectHideFlags: 0
