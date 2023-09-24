@@ -10,6 +10,7 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
+        "Sirenix.OdinInspector.Attributes.dll",
         "UniDi-Usage.dll"
     ],
     "autoReferenced": true,

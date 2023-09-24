@@ -1,17 +1,17 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Sirenix.OdinInspector;
+using UniDi;
 using UnityEngine;
-using UnityEngine.Pool;
-using UnityEngine.Serialization;
 
 namespace Exanite.SceneManagement
 {
     [DefaultExecutionOrder(-100000)]
-    public class SceneContract : MonoBehaviour
+    public class SceneLoader : MonoBehaviour
     {
-        [FormerlySerializedAs("initStages")]
         [Header("Configuration")]
-        [SerializeField] private List<SceneLoadStage> loadStages = new();
+        [Required] private SceneContext sceneContext;
+        [SerializeField] private List<SceneLoadStage> stages = new();
         [Space]
         [SerializeField] private bool disableSceneObjectsDuringLoad = true;
 
@@ -41,9 +41,9 @@ namespace Exanite.SceneManagement
 
         private async UniTask LoadScene()
         {
-            foreach (var loadStage in loadStages)
+            foreach (var stage in stages)
             {
-                await loadStage.Load();
+                await stage.Load();
             }
         }
 
@@ -51,7 +51,7 @@ namespace Exanite.SceneManagement
         {
             var scene = gameObject.scene;
 
-            using (ListPool<GameObject>.Get(out var rootGameObjects))
+            using (UnityEngine.Pool.ListPool<GameObject>.Get(out var rootGameObjects))
             {
                 // Get root GameObjects before creating the temporary GameObject below
                 scene.GetRootGameObjects(rootGameObjects);
