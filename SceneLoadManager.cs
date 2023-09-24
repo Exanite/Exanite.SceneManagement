@@ -18,14 +18,9 @@ namespace Exanite.SceneManagement
     {
         public const string ParentSceneId = "ParentScene";
 
-        /// <summary>
-        /// Ensures only one scene load operation happens at a time.
-        /// </summary>
-        private static UniTaskMonitor SceneLoadMonitor { get; } = new();
-
         [Inject] private SceneContextRegistry sceneContextRegistry;
 
-        public static bool IsLoading => SceneLoadMonitor.HasPending;
+        public static bool IsLoading => SceneLoadMonitors.Load.HasPending;
 
         /// <summary>
         /// Loads the <see cref="Scene"/> using the provided <see cref="Scene"/> as its parent.
@@ -98,7 +93,7 @@ namespace Exanite.SceneManagement
 
             try
             {
-                await SceneLoadMonitor.AcquireLock();
+                await SceneLoadMonitors.Load.AcquireLock();
 
                 bindings += container =>
                 {
@@ -116,7 +111,7 @@ namespace Exanite.SceneManagement
             }
             finally
             {
-                SceneLoadMonitor.ReleaseLock();
+                SceneLoadMonitors.Load.ReleaseLock();
                 CleanupSceneContextParameters();
             }
         }
@@ -153,7 +148,7 @@ namespace Exanite.SceneManagement
 
             try
             {
-                await SceneLoadMonitor.AcquireLock();
+                await SceneLoadMonitors.Load.AcquireLock();
 
                 SetSceneContextParameters(null, bindings, bindingsLate);
 
@@ -163,7 +158,7 @@ namespace Exanite.SceneManagement
             }
             finally
             {
-                SceneLoadMonitor.ReleaseLock();
+                SceneLoadMonitors.Load.ReleaseLock();
                 CleanupSceneContextParameters();
             }
         }
@@ -186,15 +181,22 @@ namespace Exanite.SceneManagement
 
         private async UniTask<Scene> LoadScene(string sceneName, LoadSceneParameters loadSceneParameters)
         {
-            await SceneManager.LoadSceneAsync(sceneName, loadSceneParameters);
+            try
+            {
+                await SceneLoadMonitors.Activation.AcquireLock();
+
+                await SceneManager.LoadSceneAsync(sceneName, loadSceneParameters);
+
+                // Wait for scene to initialize
+                await UniTask.Yield();
+            }
+            finally
+            {
+                SceneLoadMonitors.Activation.ReleaseLock();
+            }
 
             // LoadSceneAsync does not return the newly loaded scene, this is the only way to get the new scene
-            var scene = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
-
-            // Wait for scene to initialize
-            await UniTask.Yield();
-
-            return scene;
+            return SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
         }
 
         /// <summary>

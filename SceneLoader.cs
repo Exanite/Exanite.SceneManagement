@@ -12,11 +12,6 @@ namespace Exanite.SceneManagement
     [DefaultExecutionOrder(-13000)]
     public class SceneLoader : MonoBehaviour
     {
-        /// <summary>
-        /// Ensures only one scene activation operation happens at a time.
-        /// </summary>
-        private static UniTaskMonitor SceneActivationMonitor { get; } = new();
-
         [Header("Configuration")]
         [Required]
         [SerializeField] private SceneIdentifier identifier;
@@ -126,7 +121,7 @@ namespace Exanite.SceneManagement
 
             try
             {
-                await SceneActivationMonitor.AcquireLock();
+                await SceneLoadMonitors.Activation.AcquireLock();
 
                 HasActivatedScene = true;
 
@@ -137,7 +132,7 @@ namespace Exanite.SceneManagement
             }
             finally
             {
-                SceneActivationMonitor.ReleaseLock();
+                SceneLoadMonitors.Activation.ReleaseLock();
             }
 
             // Wait 3 frames (arbitrary number) for any additional load tasks added by activated scene objects
