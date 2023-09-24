@@ -18,8 +18,7 @@ namespace Exanite.SceneManagement.Stages
         private async UniTask<SceneLoader> GetOrLoadParentScene(SceneLoader sceneLoader, DiContainer container)
         {
             // Wait for all scene load operations to complete
-            var sceneLoadManager = container.Resolve<SceneLoadManager>();
-            await UniTask.WaitWhile(() => sceneLoadManager.IsLoading);
+            await UniTask.WaitWhile(() => SceneLoadManager.IsLoading);
 
             // Check to see if there are existing scenes compatible with being a parent of this scene
             var existingScenes = SceneLoaderRegistry.SceneLoaders.Where(pair =>

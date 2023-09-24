@@ -18,12 +18,11 @@ namespace Exanite.SceneManagement
     {
         public const string ParentSceneId = "ParentScene";
 
-        private int internalLoadingCount;
-        private bool internalIsLoading;
+        private static UniTaskMonitor SceneLoadMonitor { get; } = new();
 
         [Inject] private SceneContextRegistry sceneContextRegistry;
 
-        public bool IsLoading => internalLoadingCount != 0;
+        public static bool IsLoading => SceneLoadMonitor.HasPending;
 
         /// <summary>
         ///     Loads the <see cref="Scene"/> using the provided
@@ -95,7 +94,7 @@ namespace Exanite.SceneManagement
                 throw new ArgumentException($"Failed to load scene. Specified scene '{sceneName}' does not exist.", nameof(sceneName));
             }
 
-            await AcquireLock();
+            await SceneLoadMonitor.AcquireLock();
 
             bindings += container =>
             {
@@ -115,7 +114,7 @@ namespace Exanite.SceneManagement
             }
             finally
             {
-                ReleaseLock();
+                SceneLoadMonitor.ReleaseLock();
                 CleanupSceneLoad();
             }
         }
@@ -150,7 +149,7 @@ namespace Exanite.SceneManagement
                 throw new ArgumentException($"Failed to load scene. Specified scene '{sceneName}' does not exist.", nameof(sceneName));
             }
 
-            await AcquireLock();
+            await SceneLoadMonitor.AcquireLock();
 
             PrepareSceneLoad(null, bindings, bindingsLate);
 
@@ -162,16 +161,16 @@ namespace Exanite.SceneManagement
             }
             finally
             {
-                ReleaseLock();
+                SceneLoadMonitor.ReleaseLock();
                 CleanupSceneLoad();
             }
         }
 
         /// <summary>
-        ///     Unloads the provided <see cref="Scene"/>
+        /// Unloads the provided <see cref="Scene"/>
         /// </summary>
         /// <param name="scene">
-        ///     The <see cref="Scene"/> to unload
+        /// The <see cref="Scene"/> to unload
         /// </param>
         public async UniTask UnloadScene(Scene scene)
         {
@@ -181,25 +180,6 @@ namespace Exanite.SceneManagement
             }
 
             await SceneManager.UnloadSceneAsync(scene);
-        }
-
-        /// <summary>
-        ///     Used to ensure only one scene load operation happens at a time.
-        /// </summary>
-        private async UniTask AcquireLock()
-        {
-            internalLoadingCount++;
-            await UniTask.WaitWhile(() => internalIsLoading);
-            internalIsLoading = true;
-        }
-
-        /// <summary>
-        ///     Used to ensure only one scene load operation happens at a time.
-        /// </summary>
-        private void ReleaseLock()
-        {
-            internalIsLoading = false;
-            internalLoadingCount--;
         }
 
         private async UniTask<Scene> LoadScene(string sceneName, LoadSceneParameters loadSceneParameters)
@@ -216,8 +196,7 @@ namespace Exanite.SceneManagement
         }
 
         /// <summary>
-        ///     Configures the next scene loaded to use the provided parent and
-        ///     bindings.
+        /// Configures the next scene loaded to use the provided parent and bindings.
         /// </summary>
         private static void PrepareSceneLoad(SceneContext parent, Action<DiContainer> bindings, Action<DiContainer> bindingsLate)
         {
