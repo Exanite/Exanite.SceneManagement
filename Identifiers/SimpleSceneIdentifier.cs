@@ -30,7 +30,7 @@ namespace Exanite.SceneManagement.Identifiers
 
             var newScene = await sceneLoadManager.LoadAdditiveScene(sceneName, null, LocalPhysicsMode);
             var newSceneLoader = SceneLoaderRegistry.SceneLoaders[newScene];
-            Assert.AreEqual(this, newSceneLoader.Identifier);
+            Assert.AreEqual(this, newSceneLoader.Identifier, "Loaded scene does not have expected scene identifier");
 
             return newScene;
         }
