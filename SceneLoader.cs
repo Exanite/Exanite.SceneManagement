@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using Sirenix.OdinInspector;
 using UniDi;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector;
+#endif
 
 namespace Exanite.SceneManagement
 {
@@ -13,9 +15,13 @@ namespace Exanite.SceneManagement
     public class SceneLoader : MonoBehaviour
     {
         [Header("Configuration")]
+#if ODIN_INSPECTOR
         [Required]
+#endif
         [SerializeField] private SceneIdentifier identifier;
+#if ODIN_INSPECTOR
         [Required]
+#endif
         [SerializeField] private SceneContext sceneContext;
         [SerializeField] private List<SceneLoadStage> stages = new();
 

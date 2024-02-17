@@ -1,17 +1,21 @@
 using System;
-using System.Linq;
 using Cysharp.Threading.Tasks;
-using Sirenix.OdinInspector;
 using UniDi;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector;
+#endif
 
 namespace Exanite.SceneManagement.Identifiers
 {
     public class SimpleSceneIdentifier : SceneIdentifier
     {
-        [Required] [SerializeField] private string sceneName;
+#if ODIN_INSPECTOR
+        [Required]
+#endif
+        [SerializeField] private string sceneName;
         [SerializeField] private InspectorLocalPhysicsMode localPhysicsMode;
 
         public LocalPhysicsMode LocalPhysicsMode
