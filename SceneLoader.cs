@@ -133,7 +133,7 @@ namespace Exanite.SceneManagement
 
                 var parentContainers = parentSceneLoaders.Select(loader => loader.SceneContext.Container).ToList();
                 SceneLoadManager.SetSceneContextParameters(parentContainers.Count == 0 ? null : parentContainers);
-                ActivateSceneObjects();
+                EnableSceneObjects();
                 SceneLoadManager.CleanupSceneContextParameters();
             }
             finally
@@ -180,7 +180,7 @@ namespace Exanite.SceneManagement
             }
         }
 
-        private void ActivateSceneObjects()
+        private void EnableSceneObjects()
         {
             if (sceneObjectsParent == null)
             {
