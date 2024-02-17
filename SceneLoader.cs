@@ -190,7 +190,7 @@ namespace Exanite.SceneManagement
             sceneObjectsParent.gameObject.SetActive(true);
             while (sceneObjectsParent.childCount != 0)
             {
-                var child = sceneObjectsParent.GetChild(sceneObjectsParent.childCount - 1);
+                var child = sceneObjectsParent.GetChild(0);
                 child.transform.SetParent(null, true);
                 SceneManager.MoveGameObjectToScene(child.gameObject, gameObject.scene);
             }
