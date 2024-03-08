@@ -103,6 +103,9 @@ namespace Exanite.SceneManagement
         {
             IsLoading = true;
             HasActivatedScene = false;
+
+            transform.parent = null;
+            transform.SetAsFirstSibling();
             DisableSceneObjects();
 
             ProjectContext.Instance.EnsureIsInitialized();
