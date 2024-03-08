@@ -104,18 +104,24 @@ namespace Exanite.SceneManagement
             IsLoading = true;
             HasActivatedScene = false;
 
+            // Ensure scene loader does not have a parent
             transform.parent = null;
             transform.SetAsFirstSibling();
+
+            // Prevent scene from activating
             DisableSceneObjects();
 
+            // Initialize DI
             ProjectContext.Instance.EnsureIsInitialized();
             var container = ProjectContext.Instance.Container;
 
+            // Run load stages
             foreach (var stage in stages)
             {
                 await stage.Load(this, container);
             }
 
+            // Wait for parent scenes to initialize
             while (pendingParentSceneLoaders.Count > 0)
             {
                 pendingParentSceneLoaders.RemoveAll(parent => !parent.IsLoading);
@@ -123,6 +129,7 @@ namespace Exanite.SceneManagement
                 await UniTask.Yield();
             }
 
+            // Activate scene
             try
             {
                 await SceneLoadMonitors.Activation.AcquireLock();
@@ -139,12 +146,14 @@ namespace Exanite.SceneManagement
                 SceneLoadMonitors.Activation.ReleaseLock();
             }
 
-            // Wait 3 frames (arbitrary number) for any additional load tasks added by activated scene objects
+            // Wait 3 frames (arbitrary number)
+            // This allows objects in the scene to add more load tasks if necessary
             for (var i = 0; i < 3; i++)
             {
                 await UniTask.Yield();
             }
 
+            // Wait for all pending tasks to finish
             while (pendingTasks.Count > 0)
             {
                 await pendingTasks[0];
