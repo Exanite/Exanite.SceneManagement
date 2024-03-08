@@ -24,11 +24,11 @@ namespace Exanite.SceneManagement.Identifiers
             set => localPhysicsMode = (InspectorLocalPhysicsMode)value;
         }
 
-        public override async UniTask<Scene> Load(SceneLoader sceneLoader, DiContainer container)
+        public override async UniTask<Scene> Load(SceneLoader sceneLoader, DiContainer container, bool additive = true)
         {
             var sceneLoadManager = container.Resolve<SceneLoadManager>();
 
-            var newScene = await sceneLoadManager.LoadAdditiveScene(sceneName, null, LocalPhysicsMode);
+            var newScene = await sceneLoadManager.LoadScene(sceneName, default, LocalPhysicsMode, null, null, additive);
             var newSceneLoader = SceneLoaderRegistry.SceneLoaders[newScene];
             Assert.AreEqual(this, newSceneLoader.Identifier, "Loaded scene does not have expected scene identifier");
 

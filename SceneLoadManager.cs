@@ -29,6 +29,49 @@ namespace Exanite.SceneManagement
         /// The name of the <see cref="Scene"/> to load.
         /// </param>
         /// <param name="parent">
+        /// The parent of the new <see cref="Scene"/>. Ignored if <see cref="additive"/> is <see langword="false"/>.
+        /// </param>
+        /// <param name="localPhysicsMode">
+        /// Should this scene have its own physics simulation?
+        /// </param>
+        /// <param name="bindings">
+        /// Bindings to install to the <see cref="DiContainer"/>.
+        /// </param>
+        /// <param name="bindingsLate">
+        /// Late bindings to install to the <see cref="DiContainer"/>, these
+        /// are installed after all other bindings are installed.
+        /// </param>
+        /// <param name="additive">
+        /// Should the scene use additive or single loading?
+        /// </param>
+        /// <returns>
+        /// The newly loaded <see cref="Scene"/>
+        /// </returns>
+        public UniTask<Scene> LoadScene(
+            string sceneName,
+            Scene parent = default,
+            LocalPhysicsMode localPhysicsMode = LocalPhysicsMode.None,
+            Action<DiContainer> bindings = null,
+            Action<DiContainer> bindingsLate = null,
+            bool additive = true)
+        {
+            if (additive)
+            {
+                return LoadAdditiveScene(sceneName, parent, localPhysicsMode, bindings, bindingsLate);
+            }
+            else
+            {
+                return LoadSingleScene(sceneName, localPhysicsMode, bindings, bindingsLate);
+            }
+        }
+
+        /// <summary>
+        /// Loads the <see cref="Scene"/> using the provided <see cref="Scene"/> as its parent.
+        /// </summary>
+        /// <param name="sceneName">
+        /// The name of the <see cref="Scene"/> to load.
+        /// </param>
+        /// <param name="parent">
         /// The parent of the new <see cref="Scene"/>.
         /// </param>
         /// <param name="localPhysicsMode">
