@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Exanite.SceneManagement
@@ -9,16 +10,14 @@ namespace Exanite.SceneManagement
 
         public static IReadOnlyDictionary<Scene, SceneLoader> SceneLoaders => SceneLoadersDictionary;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void Initialize()
+        {
+            SceneLoadersDictionary.Clear();
+        }
+
         public static void Register(Scene scene, SceneLoader sceneLoader)
         {
-            if (SceneLoadersDictionary.TryGetValue(scene, out var existingSceneLoader))
-            {
-                if (sceneLoader == existingSceneLoader)
-                {
-                    return;
-                }
-            }
-
             SceneLoadersDictionary.Add(scene, sceneLoader);
         }
 

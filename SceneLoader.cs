@@ -75,7 +75,7 @@ namespace Exanite.SceneManagement
 
         private void OnDestroy()
         {
-            SceneLoaderRegistry.Register(gameObject.scene, this);
+            SceneLoaderRegistry.Unregister(gameObject.scene);
         }
 
         public void AddParentSceneLoader(SceneLoader parentSceneLoader)
