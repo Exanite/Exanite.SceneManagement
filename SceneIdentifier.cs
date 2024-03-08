@@ -6,6 +6,6 @@ namespace Exanite.SceneManagement
 {
     public abstract class SceneIdentifier : ScriptableObject
     {
-        public abstract UniTask<Scene> Load(Scene currentScene, bool isAdditive = true);
+        public abstract UniTask<Scene> Load(bool isAdditive = true);
     }
 }
