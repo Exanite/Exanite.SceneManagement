@@ -28,8 +28,11 @@ namespace Exanite.SceneManagement
         /// <param name="sceneName">
         /// The name of the <see cref="Scene"/> to load.
         /// </param>
+        /// <param name="isAdditive">
+        /// Should the scene use additive or single loading?
+        /// </param>
         /// <param name="parent">
-        /// The parent of the new <see cref="Scene"/>. Ignored if <see cref="additive"/> is <see langword="false"/>.
+        /// The parent of the new <see cref="Scene"/>. Ignored if <see cref="isAdditive"/> is <see langword="false"/>.
         /// </param>
         /// <param name="localPhysicsMode">
         /// Should this scene have its own physics simulation?
@@ -41,21 +44,18 @@ namespace Exanite.SceneManagement
         /// Late bindings to install to the <see cref="DiContainer"/>, these
         /// are installed after all other bindings are installed.
         /// </param>
-        /// <param name="additive">
-        /// Should the scene use additive or single loading?
-        /// </param>
         /// <returns>
         /// The newly loaded <see cref="Scene"/>
         /// </returns>
         public UniTask<Scene> LoadScene(
             string sceneName,
+            bool isAdditive = true,
             Scene parent = default,
             LocalPhysicsMode localPhysicsMode = LocalPhysicsMode.None,
             Action<DiContainer> bindings = null,
-            Action<DiContainer> bindingsLate = null,
-            bool additive = true)
+            Action<DiContainer> bindingsLate = null)
         {
-            if (additive)
+            if (isAdditive)
             {
                 return LoadAdditiveScene(sceneName, parent, localPhysicsMode, bindings, bindingsLate);
             }
