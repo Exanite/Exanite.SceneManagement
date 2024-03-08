@@ -68,17 +68,14 @@ namespace Exanite.SceneManagement
 
         private void Awake()
         {
+            SceneLoaderRegistry.Register(gameObject.scene, this);
+
             LoadScene().Forget();
         }
 
-        private void OnEnable()
+        private void OnDestroy()
         {
             SceneLoaderRegistry.Register(gameObject.scene, this);
-        }
-
-        private void OnDisable()
-        {
-            SceneLoaderRegistry.Unregister(gameObject.scene);
         }
 
         public void AddParentSceneLoader(SceneLoader parentSceneLoader)
@@ -104,8 +101,6 @@ namespace Exanite.SceneManagement
 
         private async UniTask LoadScene()
         {
-            SceneLoaderRegistry.Register(gameObject.scene, this);
-
             IsLoading = true;
             HasActivatedScene = false;
             DisableSceneObjects();
