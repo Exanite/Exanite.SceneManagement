@@ -26,7 +26,7 @@ namespace Exanite.SceneManagement.Identifiers
 
         public override async UniTask<Scene> Load(bool isAdditive = true)
         {
-            var sceneLoadManager = ProjectContext.Instance.Container.Resolve<SceneLoadManager>();
+            var sceneLoadManager = ProjectContext.Instance.Container.Resolve<SceneLoader>();
 
             var newScene = await sceneLoadManager.LoadScene(sceneName, isAdditive, default, LocalPhysicsMode);
             var newSceneInitializer = SceneInitializerRegistry.SceneInitializers[newScene];

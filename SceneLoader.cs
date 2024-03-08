@@ -14,7 +14,7 @@ namespace Exanite.SceneManagement
     /// <see cref="SceneManager"/> will bypass UniDi bindings and
     /// container parenting.
     /// </summary>
-    public class SceneLoadManager : MonoBehaviour
+    public class SceneLoader : MonoBehaviour
     {
         public const string ParentSceneId = "ParentScene";
 

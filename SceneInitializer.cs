@@ -137,9 +137,9 @@ namespace Exanite.SceneManagement
                 HasActivatedScene = true;
 
                 var parentContainers = parentSceneInitializers.Select(loader => loader.SceneContext.Container).ToList();
-                SceneLoadManager.SetSceneContextParameters(parentContainers.Count == 0 ? null : parentContainers);
+                SceneLoader.SetSceneContextParameters(parentContainers.Count == 0 ? null : parentContainers);
                 EnableSceneObjects();
-                SceneLoadManager.CleanupSceneContextParameters();
+                SceneLoader.CleanupSceneContextParameters();
             }
             finally
             {
