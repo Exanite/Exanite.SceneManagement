@@ -12,7 +12,7 @@ using Sirenix.OdinInspector;
 namespace Exanite.SceneManagement
 {
     [DefaultExecutionOrder(-13000)]
-    public class SceneLoader : MonoBehaviour
+    public class SceneInitializer : MonoBehaviour
     {
         [Header("Configuration")]
 #if ODIN_INSPECTOR
@@ -37,8 +37,8 @@ namespace Exanite.SceneManagement
 
         private List<UniTask> pendingTasks = new();
 
-        private List<SceneLoader> parentSceneLoaders = new();
-        private List<SceneLoader> pendingParentSceneLoaders = new();
+        private List<SceneInitializer> parentSceneInitializers = new();
+        private List<SceneInitializer> pendingParentSceneInitializers = new();
 
         public SceneIdentifier Identifier
         {
@@ -55,12 +55,12 @@ namespace Exanite.SceneManagement
         public List<SceneLoadStage> Stages => stages;
 
         /// <summary>
-        /// Is the SceneLoader loading the scene?
+        /// Is the SceneInitializer loading the scene?
         /// </summary>
         public bool IsLoading { get; private set; }
 
         /// <summary>
-        /// Has the objects in this SceneLoader's scene been activated?
+        /// Has the objects in this SceneInitializer's scene been activated?
         /// <para/>
         /// This is part of the loading phase.
         /// </summary>
@@ -68,25 +68,25 @@ namespace Exanite.SceneManagement
 
         private void Awake()
         {
-            SceneLoaderRegistry.Register(gameObject.scene, this);
+            SceneInitializerRegistry.Register(gameObject.scene, this);
 
             LoadScene().Forget();
         }
 
         private void OnDestroy()
         {
-            SceneLoaderRegistry.Unregister(gameObject.scene);
+            SceneInitializerRegistry.Unregister(gameObject.scene);
         }
 
-        public void AddParentSceneLoader(SceneLoader parentSceneLoader)
+        public void AddParentSceneInitializer(SceneInitializer parentSceneInitializer)
         {
             if (HasActivatedScene)
             {
                 throw new InvalidOperationException($"Can only add parent scenes before the scene has been activated.");
             }
 
-            parentSceneLoaders.Add(parentSceneLoader);
-            pendingParentSceneLoaders.Add(parentSceneLoader);
+            parentSceneInitializers.Add(parentSceneInitializer);
+            pendingParentSceneInitializers.Add(parentSceneInitializer);
         }
 
         public void AddPendingTask(UniTask task)
@@ -122,9 +122,9 @@ namespace Exanite.SceneManagement
             }
 
             // Wait for parent scenes to initialize
-            while (pendingParentSceneLoaders.Count > 0)
+            while (pendingParentSceneInitializers.Count > 0)
             {
-                pendingParentSceneLoaders.RemoveAll(parent => !parent.IsLoading);
+                pendingParentSceneInitializers.RemoveAll(parent => !parent.IsLoading);
 
                 await UniTask.Yield();
             }
@@ -136,7 +136,7 @@ namespace Exanite.SceneManagement
 
                 HasActivatedScene = true;
 
-                var parentContainers = parentSceneLoaders.Select(loader => loader.SceneContext.Container).ToList();
+                var parentContainers = parentSceneInitializers.Select(loader => loader.SceneContext.Container).ToList();
                 SceneLoadManager.SetSceneContextParameters(parentContainers.Count == 0 ? null : parentContainers);
                 EnableSceneObjects();
                 SceneLoadManager.CleanupSceneContextParameters();

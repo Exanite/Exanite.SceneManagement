@@ -29,8 +29,8 @@ namespace Exanite.SceneManagement.Identifiers
             var sceneLoadManager = ProjectContext.Instance.Container.Resolve<SceneLoadManager>();
 
             var newScene = await sceneLoadManager.LoadScene(sceneName, isAdditive, default, LocalPhysicsMode);
-            var newSceneLoader = SceneLoaderRegistry.SceneLoaders[newScene];
-            Assert.AreEqual(this, newSceneLoader.Identifier, "Loaded scene does not have expected scene identifier");
+            var newSceneInitializer = SceneInitializerRegistry.SceneInitializers[newScene];
+            Assert.AreEqual(this, newSceneInitializer.Identifier, "Loaded scene does not have expected scene identifier");
 
             return newScene;
         }

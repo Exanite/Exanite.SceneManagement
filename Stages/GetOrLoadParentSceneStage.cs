@@ -12,18 +12,18 @@ namespace Exanite.SceneManagement.Stages
         public override async UniTask Load(Scene currentScene)
         {
             var parentScene = await GetOrLoadParentScene(currentScene);
-            var sceneLoader = SceneLoaderRegistry.SceneLoaders[currentScene];
+            var sceneInitializer = SceneInitializerRegistry.SceneInitializers[currentScene];
 
-            sceneLoader.AddParentSceneLoader(parentScene);
+            sceneInitializer.AddParentSceneInitializer(parentScene);
         }
 
-        private async UniTask<SceneLoader> GetOrLoadParentScene(Scene currentScene)
+        private async UniTask<SceneInitializer> GetOrLoadParentScene(Scene currentScene)
         {
             // Wait for all scene load operations to complete
             await UniTask.WaitWhile(() => SceneLoadManager.IsLoading);
 
             // Check to see if there are existing scenes compatible with being a parent of this scene
-            var existingScene = SceneLoaderRegistry.SceneLoaders.FirstOrDefault(pair =>
+            var existingScene = SceneInitializerRegistry.SceneInitializers.FirstOrDefault(pair =>
                 {
                     return IsCompatibleScene(pair.Value);
                 })
@@ -36,12 +36,12 @@ namespace Exanite.SceneManagement.Stages
 
             // Otherwise, create a new parent
             var parentScene = await parentSceneIdentifier.Load();
-            var parentSceneLoader = SceneLoaderRegistry.SceneLoaders[parentScene];
+            var parentSceneInitializer = SceneInitializerRegistry.SceneInitializers[parentScene];
 
-            return parentSceneLoader;
+            return parentSceneInitializer;
         }
 
-        protected virtual bool IsCompatibleScene(SceneLoader scene)
+        protected virtual bool IsCompatibleScene(SceneInitializer scene)
         {
             return scene.Identifier == parentSceneIdentifier;
         }
