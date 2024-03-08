@@ -35,7 +35,7 @@ namespace Exanite.SceneManagement.Stages
             }
 
             // Otherwise, create a new parent
-            var parentScene = await parentSceneIdentifier.Load();
+            var parentScene = await parentSceneIdentifier.Load(LoadSceneMode.Additive);
             var parentSceneInitializer = SceneInitializerRegistry.SceneInitializers[parentScene];
 
             return parentSceneInitializer;

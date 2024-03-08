@@ -28,7 +28,7 @@ namespace Exanite.SceneManagement
         /// <param name="sceneName">
         /// The name of the <see cref="Scene"/> to load.
         /// </param>
-        /// <param name="isAdditive">
+        /// <param name="loadMode">
         /// Should the scene use additive or single loading?
         /// </param>
         /// <param name="parent">
@@ -49,13 +49,13 @@ namespace Exanite.SceneManagement
         /// </returns>
         public UniTask<Scene> LoadScene(
             string sceneName,
-            bool isAdditive = true,
+            LoadSceneMode loadMode,
             Scene parent = default,
             LocalPhysicsMode localPhysicsMode = LocalPhysicsMode.None,
             Action<DiContainer> bindings = null,
             Action<DiContainer> bindingsLate = null)
         {
-            if (isAdditive)
+            if (loadMode == LoadSceneMode.Additive)
             {
                 return LoadAdditiveScene(sceneName, parent, localPhysicsMode, bindings, bindingsLate);
             }
