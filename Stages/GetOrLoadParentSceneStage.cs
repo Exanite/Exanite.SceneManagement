@@ -2,6 +2,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using UniDi;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Exanite.SceneManagement.Stages
 {
@@ -9,13 +10,15 @@ namespace Exanite.SceneManagement.Stages
     {
         [SerializeField] private SceneIdentifier parentSceneIdentifier;
 
-        public override async UniTask Load(SceneLoader sceneLoader, DiContainer container)
+        public override async UniTask Load(Scene currentScene)
         {
-            var parentScene = await GetOrLoadParentScene(sceneLoader, container);
+            var parentScene = await GetOrLoadParentScene(currentScene);
+            var sceneLoader = SceneLoaderRegistry.SceneLoaders[currentScene];
+
             sceneLoader.AddParentSceneLoader(parentScene);
         }
 
-        private async UniTask<SceneLoader> GetOrLoadParentScene(SceneLoader sceneLoader, DiContainer container)
+        private async UniTask<SceneLoader> GetOrLoadParentScene(Scene currentScene)
         {
             // Wait for all scene load operations to complete
             await UniTask.WaitWhile(() => SceneLoadManager.IsLoading);
@@ -38,7 +41,7 @@ namespace Exanite.SceneManagement.Stages
             }
 
             // Otherwise, create a new parent
-            var parentScene = await parentSceneIdentifier.Load(sceneLoader, container);
+            var parentScene = await parentSceneIdentifier.Load(currentScene);
             var parentSceneLoader = SceneLoaderRegistry.SceneLoaders[parentScene];
 
             return parentSceneLoader;

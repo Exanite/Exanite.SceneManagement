@@ -24,8 +24,9 @@ namespace Exanite.SceneManagement.Identifiers
             set => localPhysicsMode = (InspectorLocalPhysicsMode)value;
         }
 
-        public override async UniTask<Scene> Load(SceneLoader sceneLoader, DiContainer container, bool additive = true)
+        public override async UniTask<Scene> Load(Scene currentScene, bool additive = true)
         {
+            var container = SceneLoaderRegistry.SceneLoaders[currentScene].SceneContext.Container;
             var sceneLoadManager = container.Resolve<SceneLoadManager>();
 
             var newScene = await sceneLoadManager.LoadScene(sceneName, default, LocalPhysicsMode, null, null, additive);

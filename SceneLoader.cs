@@ -118,7 +118,7 @@ namespace Exanite.SceneManagement
             // Run load stages
             foreach (var stage in stages)
             {
-                await stage.Load(this, container);
+                await stage.Load(gameObject.scene);
             }
 
             // Wait for parent scenes to initialize
