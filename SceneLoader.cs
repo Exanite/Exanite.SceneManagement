@@ -32,7 +32,7 @@ namespace Exanite.SceneManagement
         /// Should the scene use additive or single loading?
         /// </param>
         /// <param name="parent">
-        /// The parent of the new <see cref="Scene"/>. Ignored if <see cref="isAdditive"/> is <see langword="false"/>.
+        /// The parent of the new <see cref="Scene"/>. Ignored if <see cref="loadMode"/> is <see cref="LoadSceneMode.Single">LoadSceneMode.Single</see>.
         /// </param>
         /// <param name="localPhysicsMode">
         /// Should this scene have its own physics simulation?
