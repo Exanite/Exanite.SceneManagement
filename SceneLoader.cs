@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
+using Exanite.Core.Utilities;
 using UniDi;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -146,7 +148,7 @@ namespace Exanite.SceneManagement
                     }
                 };
 
-                SetSceneContextParameters(parent == null ? null : new[] { parent.Container }, bindings, bindingsLate);
+                AddSceneContextParameters(parent == null ? null : new[] { parent.Container }, bindings, bindingsLate);
 
                 var loadSceneParameters = new LoadSceneParameters(LoadSceneMode.Additive, localPhysicsMode);
 
@@ -155,7 +157,7 @@ namespace Exanite.SceneManagement
             finally
             {
                 SceneLoadMonitors.Load.ReleaseLock();
-                CleanupSceneContextParameters();
+                ClearSceneContextParameters();
             }
         }
 
@@ -193,7 +195,7 @@ namespace Exanite.SceneManagement
             {
                 await SceneLoadMonitors.Load.AcquireLock();
 
-                SetSceneContextParameters(null, bindings, bindingsLate);
+                AddSceneContextParameters(null, bindings, bindingsLate);
 
                 var loadSceneParameters = new LoadSceneParameters(LoadSceneMode.Single, localPhysicsMode);
 
@@ -202,7 +204,7 @@ namespace Exanite.SceneManagement
             finally
             {
                 SceneLoadMonitors.Load.ReleaseLock();
-                CleanupSceneContextParameters();
+                ClearSceneContextParameters();
             }
         }
 
@@ -225,18 +227,45 @@ namespace Exanite.SceneManagement
         /// <summary>
         /// Configures the next <see cref="SceneContext"/> activated to use the provided parent containers and bindings.
         /// </summary>
-        public static void SetSceneContextParameters(IEnumerable<DiContainer> parentContainers = null, Action<DiContainer> bindings = null, Action<DiContainer> bindingsLate = null)
+        public static void AddSceneContextParameters(IEnumerable<DiContainer> parentContainers = null, Action<DiContainer> bindings = null, Action<DiContainer> bindingsLate = null)
         {
-            SceneContext.ParentContainers = parentContainers;
+            if (parentContainers != null)
+            {
+                if (SceneContext.ParentContainers != null)
+                {
+                    SceneContext.ParentContainers = SceneContext.ParentContainers.WithRangeAtEnd(parentContainers);
+                }
+                else
+                {
+                    SceneContext.ParentContainers = parentContainers;
+                }
+            }
 
-            SceneContext.ExtraBindingsInstallMethod = bindings;
-            SceneContext.ExtraBindingsLateInstallMethod = bindingsLate;
+            if (bindings != null)
+            {
+                var previous = SceneContext.ExtraBindingsInstallMethod;
+                SceneContext.ExtraBindingsInstallMethod = container =>
+                {
+                    previous?.Invoke(container);
+                    bindings(container);
+                };
+            }
+
+            if (bindingsLate != null)
+            {
+                var previous = SceneContext.ExtraBindingsLateInstallMethod;
+                SceneContext.ExtraBindingsLateInstallMethod = container =>
+                {
+                    previous?.Invoke(container);
+                    bindingsLate(container);
+                };
+            }
         }
 
         /// <summary>
-        /// Cleans up parameters set in <see cref="SetSceneContextParameters"/>.
+        /// Clears the parameters set by <see cref="AddSceneContextParameters"/>.
         /// </summary>
-        public static void CleanupSceneContextParameters()
+        public static void ClearSceneContextParameters()
         {
             SceneContext.ParentContainers = null;
 
