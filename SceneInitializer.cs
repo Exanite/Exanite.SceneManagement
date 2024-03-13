@@ -113,7 +113,6 @@ namespace Exanite.SceneManagement
 
             // Initialize DI
             ProjectContext.Instance.EnsureIsInitialized();
-            var container = ProjectContext.Instance.Container;
 
             // Run load stages
             foreach (var stage in stages)
