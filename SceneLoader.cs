@@ -234,11 +234,14 @@ namespace Exanite.SceneManagement
                 var set = new HashSet<DiContainer>();
                 var list = new List<DiContainer>();
 
-                foreach (var parentContainer in SceneContext.ParentContainers)
+                if (SceneContext.ParentContainers != null)
                 {
-                    if (set.Add(parentContainer))
+                    foreach (var parentContainer in SceneContext.ParentContainers)
                     {
-                        list.Add(parentContainer);
+                        if (set.Add(parentContainer))
+                        {
+                            list.Add(parentContainer);
+                        }
                     }
                 }
 
