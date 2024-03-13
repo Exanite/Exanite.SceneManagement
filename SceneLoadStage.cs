@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 
 namespace Exanite.SceneManagement
 {
-    public abstract class SceneInitializeStage : MonoBehaviour
+    public abstract class SceneLoadStage : MonoBehaviour
     {
         public abstract UniTask Load(Scene currentScene);
     }
