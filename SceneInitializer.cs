@@ -111,6 +111,12 @@ namespace Exanite.SceneManagement
             // Prevent scene from activating
             DisableSceneObjects();
 
+            // Since we disable scene objects, the scene's SceneContext will not be able to consume these parameters
+            // These parameters must be saved and restored before the SceneContext activates
+            var initialParentContainers = SceneContext.ParentContainers;
+            var initialBindings = SceneContext.ExtraBindingsInstallMethod;
+            var initialBindingsLate = SceneContext.ExtraBindingsLateInstallMethod;
+
             // Initialize DI
             ProjectContext.Instance.EnsureIsInitialized();
 
@@ -143,6 +149,7 @@ namespace Exanite.SceneManagement
                 HasActivatedScene = true;
 
                 var parentContainers = parentSceneInitializers.Select(loader => loader.SceneContext.Container).ToList();
+                SceneLoader.AddSceneContextParameters(initialParentContainers, initialBindings, initialBindingsLate);
                 SceneLoader.AddSceneContextParameters(parentContainers.Count == 0 ? null : parentContainers);
                 EnableSceneObjects();
                 SceneLoader.ClearSceneContextParameters();
