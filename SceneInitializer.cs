@@ -128,6 +128,13 @@ namespace Exanite.SceneManagement
                 await UniTask.Yield();
             }
 
+            // Wait 1 frame (arbitrary number)
+            // This makes it obvious that the scene objects are disabled when stepping through each frame
+            for (var i = 0; i < 3; i++)
+            {
+                await UniTask.Yield();
+            }
+
             // Activate scene
             try
             {
