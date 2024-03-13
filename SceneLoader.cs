@@ -232,35 +232,31 @@ namespace Exanite.SceneManagement
         {
             if (parentContainers != null)
             {
-                if (SceneContext.ParentContainers != null)
+                // Need to prevent duplicates and maintain ordering
+                var set = new HashSet<DiContainer>();
+                var list = new List<DiContainer>();
+
+                foreach (var parentContainer in SceneContext.ParentContainers)
                 {
-                    SceneContext.ParentContainers = SceneContext.ParentContainers.WithRangeAtEnd(parentContainers);
+                    if (set.Add(parentContainer))
+                    {
+                        list.Add(parentContainer);
+                    }
                 }
-                else
+
+                foreach (var parentContainer in parentContainers)
                 {
-                    SceneContext.ParentContainers = parentContainers;
+                    if (set.Add(parentContainer))
+                    {
+                        list.Add(parentContainer);
+                    }
                 }
+
+                SceneContext.ParentContainers = list;
             }
 
-            if (bindings != null)
-            {
-                var previous = SceneContext.ExtraBindingsInstallMethod;
-                SceneContext.ExtraBindingsInstallMethod = container =>
-                {
-                    previous?.Invoke(container);
-                    bindings(container);
-                };
-            }
-
-            if (bindingsLate != null)
-            {
-                var previous = SceneContext.ExtraBindingsLateInstallMethod;
-                SceneContext.ExtraBindingsLateInstallMethod = container =>
-                {
-                    previous?.Invoke(container);
-                    bindingsLate(container);
-                };
-            }
+            SceneContext.ExtraBindingsInstallMethod += bindings;
+            SceneContext.ExtraBindingsLateInstallMethod += bindingsLate;
         }
 
         /// <summary>
