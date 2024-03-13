@@ -23,7 +23,7 @@ namespace Exanite.SceneManagement
         [Required]
 #endif
         [SerializeField] private SceneContext sceneContext;
-        [SerializeField] private List<SceneLoadStage> stages = new();
+        [SerializeField] private List<SceneInitializeStage> stages = new();
 
         /// <summary>
         /// Stores all of the original objects in the scene while resources are being loaded.
@@ -52,7 +52,7 @@ namespace Exanite.SceneManagement
             set => sceneContext = value;
         }
 
-        public List<SceneLoadStage> Stages => stages;
+        public List<SceneInitializeStage> Stages => stages;
 
         /// <summary>
         /// Is the SceneInitializer loading the scene?
