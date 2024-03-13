@@ -157,7 +157,7 @@ namespace Exanite.SceneManagement
             finally
             {
                 ClearSceneContextParameters();
-                
+
                 SceneLoadMonitors.Load.ReleaseLock();
             }
         }
