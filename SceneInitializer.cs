@@ -16,7 +16,7 @@ namespace Exanite.SceneManagement
     {
         [Header("Configuration")]
 #if ODIN_INSPECTOR
-        [Required]
+        [RequiredIn(PrefabKind.InstanceInScene | PrefabKind.NonPrefabInstance)]
 #endif
         [SerializeField] private SceneIdentifier identifier;
 #if ODIN_INSPECTOR
