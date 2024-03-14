@@ -120,10 +120,13 @@ namespace Exanite.SceneManagement
             // Initialize DI
             ProjectContext.Instance.EnsureIsInitialized();
 
-            // Run load stages
+            // Run load stages that don't require scene initialization
             foreach (var stage in stages)
             {
-                await stage.Load(gameObject.scene);
+                if (!stage.WaitForSceneInitialization)
+                {
+                    await stage.Load(gameObject.scene);
+                }
             }
 
             // Wait for parent scenes to initialize
@@ -157,6 +160,15 @@ namespace Exanite.SceneManagement
             finally
             {
                 SceneLoadMonitors.Activation.ReleaseLock();
+            }
+
+            // Run load stages that require scene initialization
+            foreach (var stage in stages)
+            {
+                if (stage.WaitForSceneInitialization)
+                {
+                    await stage.Load(gameObject.scene);
+                }
             }
 
             // Wait 3 frames (arbitrary number)
