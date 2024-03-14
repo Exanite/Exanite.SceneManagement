@@ -131,8 +131,8 @@ namespace Exanite.SceneManagement
                     }
                 };
 
-                AddSceneContextParentContainers(parent == null ? null : new[] { parent.Container });
-                AddSceneContextBindings(bindings);
+                AddSceneParentContainers(parent == null ? null : new[] { parent.Container });
+                AddSceneBindings(bindings);
 
                 var loadSceneParameters = new LoadSceneParameters(LoadSceneMode.Additive, localPhysicsMode);
 
@@ -140,7 +140,7 @@ namespace Exanite.SceneManagement
             }
             finally
             {
-                ClearSceneContextParameters();
+                ClearSceneParameters();
 
                 SceneLoadMonitors.Load.ReleaseLock();
             }
@@ -175,7 +175,7 @@ namespace Exanite.SceneManagement
             {
                 await SceneLoadMonitors.Load.AcquireLock();
 
-                AddSceneContextBindings(bindings);
+                AddSceneBindings(bindings);
 
                 var loadSceneParameters = new LoadSceneParameters(LoadSceneMode.Single, localPhysicsMode);
 
@@ -184,7 +184,7 @@ namespace Exanite.SceneManagement
             finally
             {
                 SceneLoadMonitors.Load.ReleaseLock();
-                ClearSceneContextParameters();
+                ClearSceneParameters();
             }
         }
 
@@ -207,7 +207,7 @@ namespace Exanite.SceneManagement
         /// <summary>
         /// Adds the parent containers to the next <see cref="SceneContext"/> activated.
         /// </summary>
-        public static void AddSceneContextParentContainers(IEnumerable<DiContainer> parentContainers)
+        public static void AddSceneParentContainers(IEnumerable<DiContainer> parentContainers)
         {
             if (parentContainers != null)
             {
@@ -241,18 +241,17 @@ namespace Exanite.SceneManagement
         /// <summary>
         /// Adds the bindings to the next <see cref="SceneContext"/> activated.
         /// </summary>
-        public static void AddSceneContextBindings(Action<DiContainer> bindings)
+        public static void AddSceneBindings(Action<DiContainer> bindings)
         {
             SceneContext.ExtraBindingsInstallMethod += bindings;
         }
 
         /// <summary>
-        /// Clears the parameters set by <see cref="AddSceneContextParameters"/>.
+        /// Clears the parameters set by <see cref="AddSceneParentContainers"/> and <see cref="AddSceneBindings"/>.
         /// </summary>
-        public static void ClearSceneContextParameters()
+        public static void ClearSceneParameters()
         {
             SceneContext.ParentContainers = null;
-
             SceneContext.ExtraBindingsInstallMethod = null;
         }
 
