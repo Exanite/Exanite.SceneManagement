@@ -115,7 +115,6 @@ namespace Exanite.SceneManagement
             // These parameters must be saved and restored before the SceneContext activates
             var initialParentContainers = SceneContext.ParentContainers;
             var initialBindings = SceneContext.ExtraBindingsInstallMethod;
-            var initialBindingsLate = SceneContext.ExtraBindingsLateInstallMethod;
 
             // Initialize DI
             ProjectContext.Instance.EnsureIsInitialized();
@@ -152,7 +151,7 @@ namespace Exanite.SceneManagement
                 HasActivatedScene = true;
 
                 var parentContainers = parentSceneInitializers.Select(loader => loader.SceneContext.Container).ToList();
-                SceneLoader.AddSceneContextParameters(initialParentContainers, initialBindings, initialBindingsLate);
+                SceneLoader.AddSceneContextParameters(initialParentContainers, initialBindings);
                 SceneLoader.AddSceneContextParameters(parentContainers.Count == 0 ? null : parentContainers);
                 EnableSceneObjects();
                 SceneLoader.ClearSceneContextParameters();

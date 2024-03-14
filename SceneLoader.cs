@@ -40,10 +40,6 @@ namespace Exanite.SceneManagement
         /// <param name="bindings">
         /// Bindings to install to the <see cref="DiContainer"/>.
         /// </param>
-        /// <param name="bindingsLate">
-        /// Late bindings to install to the <see cref="DiContainer"/>, these
-        /// are installed after all other bindings are installed.
-        /// </param>
         /// <returns>
         /// The newly loaded <see cref="Scene"/>
         /// </returns>
@@ -52,16 +48,15 @@ namespace Exanite.SceneManagement
             LoadSceneMode loadMode,
             Scene parent = default,
             LocalPhysicsMode localPhysicsMode = LocalPhysicsMode.None,
-            Action<DiContainer> bindings = null,
-            Action<DiContainer> bindingsLate = null)
+            Action<DiContainer> bindings = null)
         {
             if (loadMode == LoadSceneMode.Additive)
             {
-                return LoadAdditiveScene(sceneName, parent, localPhysicsMode, bindings, bindingsLate);
+                return LoadAdditiveScene(sceneName, parent, localPhysicsMode, bindings);
             }
             else
             {
-                return LoadSingleScene(sceneName, localPhysicsMode, bindings, bindingsLate);
+                return LoadSingleScene(sceneName, localPhysicsMode, bindings);
             }
         }
 
@@ -80,10 +75,6 @@ namespace Exanite.SceneManagement
         /// <param name="bindings">
         /// Bindings to install to the <see cref="DiContainer"/>.
         /// </param>
-        /// <param name="bindingsLate">
-        /// Late bindings to install to the <see cref="DiContainer"/>, these
-        /// are installed after all other bindings are installed.
-        /// </param>
         /// <returns>
         /// The newly loaded <see cref="Scene"/>
         /// </returns>
@@ -91,12 +82,11 @@ namespace Exanite.SceneManagement
             string sceneName,
             Scene parent = default,
             LocalPhysicsMode localPhysicsMode = LocalPhysicsMode.None,
-            Action<DiContainer> bindings = null,
-            Action<DiContainer> bindingsLate = null)
+            Action<DiContainer> bindings = null)
         {
             var context = sceneContextRegistry.TryGetSceneContextForScene(parent);
 
-            return LoadAdditiveScene(sceneName, context, localPhysicsMode, bindings, bindingsLate);
+            return LoadAdditiveScene(sceneName, context, localPhysicsMode, bindings);
         }
 
         /// <summary>
@@ -115,10 +105,6 @@ namespace Exanite.SceneManagement
         /// <param name="bindings">
         /// Bindings to install to the <see cref="DiContainer"/>.
         /// </param>
-        /// <param name="bindingsLate">
-        /// Late bindings to install to the <see cref="DiContainer"/>, these
-        /// are installed after all other bindings are installed.
-        /// </param>
         /// <returns>
         /// The newly loaded <see cref="Scene"/>.
         /// </returns>
@@ -126,8 +112,7 @@ namespace Exanite.SceneManagement
             string sceneName,
             SceneContext parent = null,
             LocalPhysicsMode localPhysicsMode = LocalPhysicsMode.None,
-            Action<DiContainer> bindings = null,
-            Action<DiContainer> bindingsLate = null)
+            Action<DiContainer> bindings = null)
         {
             if (!Application.CanStreamedLevelBeLoaded(sceneName))
             {
@@ -146,7 +131,7 @@ namespace Exanite.SceneManagement
                     }
                 };
 
-                AddSceneContextParameters(parent == null ? null : new[] { parent.Container }, bindings, bindingsLate);
+                AddSceneContextParameters(parent == null ? null : new[] { parent.Container }, bindings);
 
                 var loadSceneParameters = new LoadSceneParameters(LoadSceneMode.Additive, localPhysicsMode);
 
@@ -172,18 +157,13 @@ namespace Exanite.SceneManagement
         /// <param name="bindings">
         /// Bindings to install to the <see cref="DiContainer"/>.
         /// </param>
-        /// <param name="bindingsLate">
-        /// Late bindings to install to the <see cref="DiContainer"/>, these
-        /// are installed after all other bindings are installed.
-        /// </param>
         /// <returns>
         /// The newly loaded <see cref="Scene"/>.
         /// </returns>
         public async UniTask<Scene> LoadSingleScene(
             string sceneName,
             LocalPhysicsMode localPhysicsMode = LocalPhysicsMode.None,
-            Action<DiContainer> bindings = null,
-            Action<DiContainer> bindingsLate = null)
+            Action<DiContainer> bindings = null)
         {
             if (!Application.CanStreamedLevelBeLoaded(sceneName))
             {
@@ -194,7 +174,7 @@ namespace Exanite.SceneManagement
             {
                 await SceneLoadMonitors.Load.AcquireLock();
 
-                AddSceneContextParameters(null, bindings, bindingsLate);
+                AddSceneContextParameters(null, bindings);
 
                 var loadSceneParameters = new LoadSceneParameters(LoadSceneMode.Single, localPhysicsMode);
 
@@ -226,7 +206,7 @@ namespace Exanite.SceneManagement
         /// <summary>
         /// Configures the next <see cref="SceneContext"/> activated to use the provided parent containers and bindings.
         /// </summary>
-        public static void AddSceneContextParameters(IEnumerable<DiContainer> parentContainers = null, Action<DiContainer> bindings = null, Action<DiContainer> bindingsLate = null)
+        public static void AddSceneContextParameters(IEnumerable<DiContainer> parentContainers = null, Action<DiContainer> bindings = null)
         {
             if (parentContainers != null)
             {
@@ -257,7 +237,6 @@ namespace Exanite.SceneManagement
             }
 
             SceneContext.ExtraBindingsInstallMethod += bindings;
-            SceneContext.ExtraBindingsLateInstallMethod += bindingsLate;
         }
 
         /// <summary>
@@ -268,7 +247,6 @@ namespace Exanite.SceneManagement
             SceneContext.ParentContainers = null;
 
             SceneContext.ExtraBindingsInstallMethod = null;
-            SceneContext.ExtraBindingsLateInstallMethod = null;
         }
 
         private async UniTask<Scene> LoadScene(string sceneName, LoadSceneParameters loadSceneParameters)
