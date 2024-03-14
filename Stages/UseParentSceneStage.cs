@@ -5,7 +5,10 @@ using UnityEngine.SceneManagement;
 
 namespace Exanite.SceneManagement.Stages
 {
-    public class GetOrLoadParentSceneStage : SceneLoadStage
+    /// <summary>
+    /// Gets an existing parent scene or loads it if it is not loaded.
+    /// </summary>
+    public class UseParentSceneStage : SceneLoadStage
     {
         [SerializeField] private SceneIdentifier parentSceneIdentifier;
 
