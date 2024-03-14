@@ -6,16 +6,16 @@ using UnityEngine.SceneManagement;
 namespace Exanite.SceneManagement
 {
     /// <summary>
-    ///     Installs the <see cref="Scene"/> and <see cref="PhysicsScene"/>
-    ///     this component is in to a <see cref="DiContainer"/>
+    /// Installs the <see cref="Scene"/> and <see cref="PhysicsScene"/>
+    /// this component is in to a <see cref="DiContainer"/>
     /// </summary>
     public class SceneInstaller : MonoInstaller
     {
         [SerializeField] private bool requireLocalPhysicsScene = true;
 
         /// <summary>
-        ///     Should this <see cref="PhysicsSceneInstaller"/> require that this
-        ///     scene is loaded with a local <see cref="PhysicsScene"/>
+        /// Should this <see cref="PhysicsSceneInstaller"/> require that this
+        /// scene is loaded with a local <see cref="PhysicsScene"/>
         /// </summary>
         public bool RequireLocalPhysicsScene
         {
@@ -25,7 +25,7 @@ namespace Exanite.SceneManagement
         }
 
         /// <summary>
-        ///     Installs bindings to the <see cref="DiContainer"/>
+        /// Installs bindings to the <see cref="DiContainer"/>
         /// </summary>
         public override void InstallBindings()
         {
@@ -34,7 +34,7 @@ namespace Exanite.SceneManagement
         }
 
         /// <summary>
-        ///     Gets the <see cref="Scene"/> this component is currently in
+        /// Gets the <see cref="Scene"/> this component is currently in
         /// </summary>
         private Scene GetScene()
         {
@@ -42,8 +42,8 @@ namespace Exanite.SceneManagement
         }
 
         /// <summary>
-        ///     Gets the <see cref="PhysicsScene"/> this component is currently
-        ///     in
+        /// Gets the <see cref="PhysicsScene"/> this component is currently
+        /// in
         /// </summary>
         private PhysicsScene GetPhysicsScene()
         {
