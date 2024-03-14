@@ -131,7 +131,8 @@ namespace Exanite.SceneManagement
                     }
                 };
 
-                AddSceneContextParameters(parent == null ? null : new[] { parent.Container }, bindings);
+                AddSceneContextParentContainers(parent == null ? null : new[] { parent.Container });
+                AddSceneContextBindings(bindings);
 
                 var loadSceneParameters = new LoadSceneParameters(LoadSceneMode.Additive, localPhysicsMode);
 
@@ -174,7 +175,7 @@ namespace Exanite.SceneManagement
             {
                 await SceneLoadMonitors.Load.AcquireLock();
 
-                AddSceneContextParameters(null, bindings);
+                AddSceneContextBindings(bindings);
 
                 var loadSceneParameters = new LoadSceneParameters(LoadSceneMode.Single, localPhysicsMode);
 
@@ -204,9 +205,9 @@ namespace Exanite.SceneManagement
         }
 
         /// <summary>
-        /// Configures the next <see cref="SceneContext"/> activated to use the provided parent containers and bindings.
+        /// Adds the parent containers to the next <see cref="SceneContext"/> activated.
         /// </summary>
-        public static void AddSceneContextParameters(IEnumerable<DiContainer> parentContainers = null, Action<DiContainer> bindings = null)
+        public static void AddSceneContextParentContainers(IEnumerable<DiContainer> parentContainers)
         {
             if (parentContainers != null)
             {
@@ -235,7 +236,13 @@ namespace Exanite.SceneManagement
 
                 SceneContext.ParentContainers = list;
             }
+        }
 
+        /// <summary>
+        /// Adds the bindings to the next <see cref="SceneContext"/> activated.
+        /// </summary>
+        public static void AddSceneContextBindings(Action<DiContainer> bindings)
+        {
             SceneContext.ExtraBindingsInstallMethod += bindings;
         }
 
