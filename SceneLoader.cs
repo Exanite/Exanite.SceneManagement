@@ -22,95 +22,21 @@ namespace Exanite.SceneManagement
 
         public static bool IsLoading => SceneLoadMonitors.Load.HasPending;
 
-        /// <summary>
-        /// Loads the <see cref="Scene"/> using the provided <see cref="Scene"/> as its parent.
-        /// </summary>
-        /// <param name="sceneName">
-        /// The name of the <see cref="Scene"/> to load.
-        /// </param>
-        /// <param name="loadMode">
-        /// Should the scene use additive or single loading?
-        /// </param>
-        /// <param name="parent">
-        /// The parent of the new <see cref="Scene"/>. Ignored if <see cref="loadMode"/> is <see cref="LoadSceneMode.Single">LoadSceneMode.Single</see>.
-        /// </param>
-        /// <param name="localPhysicsMode">
-        /// Should this scene have its own physics simulation?
-        /// </param>
-        /// <param name="bindings">
-        /// Bindings to install to the <see cref="DiContainer"/>.
-        /// </param>
-        /// <returns>
-        /// The newly loaded <see cref="Scene"/>
-        /// </returns>
-        public UniTask<Scene> LoadScene(
-            string sceneName,
-            LoadSceneMode loadMode,
-            Scene parent = default,
-            LocalPhysicsMode localPhysicsMode = LocalPhysicsMode.None,
-            Action<DiContainer> bindings = null)
+        public UniTask<Scene> LoadScene(SceneLoadSettings settings)
         {
-            if (loadMode == LoadSceneMode.Additive)
+            if (settings.LoadMode == LoadSceneMode.Additive)
             {
-                return LoadAdditiveScene(sceneName, parent, localPhysicsMode, bindings);
+                return LoadAdditiveScene(settings.SceneName, settings.Parent, settings.LocalPhysicsMode, settings.Bindings);
             }
             else
             {
-                return LoadSingleScene(sceneName, localPhysicsMode, bindings);
+                return LoadSingleScene(settings.SceneName, settings.LocalPhysicsMode, settings.Bindings);
             }
         }
 
-        /// <summary>
-        /// Loads the <see cref="Scene"/> using the provided <see cref="Scene"/> as its parent.
-        /// </summary>
-        /// <param name="sceneName">
-        /// The name of the <see cref="Scene"/> to load.
-        /// </param>
-        /// <param name="parent">
-        /// The parent of the new <see cref="Scene"/>.
-        /// </param>
-        /// <param name="localPhysicsMode">
-        /// Should this scene have its own physics simulation?
-        /// </param>
-        /// <param name="bindings">
-        /// Bindings to install to the <see cref="DiContainer"/>.
-        /// </param>
-        /// <returns>
-        /// The newly loaded <see cref="Scene"/>
-        /// </returns>
-        public UniTask<Scene> LoadAdditiveScene(
+        private async UniTask<Scene> LoadAdditiveScene(
             string sceneName,
             Scene parent = default,
-            LocalPhysicsMode localPhysicsMode = LocalPhysicsMode.None,
-            Action<DiContainer> bindings = null)
-        {
-            var context = sceneContextRegistry.TryGetSceneContextForScene(parent);
-
-            return LoadAdditiveScene(sceneName, context, localPhysicsMode, bindings);
-        }
-
-        /// <summary>
-        /// Loads the <see cref="Scene"/> using the provided
-        /// <see cref="SceneContext"/> as its parent.
-        /// </summary>
-        /// <param name="sceneName">
-        /// The name of the <see cref="Scene"/> to load.
-        /// </param>
-        /// <param name="parent">
-        /// The parent of the new <see cref="Scene"/>.
-        /// </param>
-        /// <param name="localPhysicsMode">
-        /// Should this scene have its own physics simulation?
-        /// </param>
-        /// <param name="bindings">
-        /// Bindings to install to the <see cref="DiContainer"/>.
-        /// </param>
-        /// <returns>
-        /// The newly loaded <see cref="Scene"/>.
-        /// </returns>
-        public async UniTask<Scene> LoadAdditiveScene(
-            string sceneName,
-            SceneContext parent = null,
             LocalPhysicsMode localPhysicsMode = LocalPhysicsMode.None,
             Action<DiContainer> bindings = null)
         {
@@ -119,19 +45,21 @@ namespace Exanite.SceneManagement
                 throw new ArgumentException($"Failed to load scene. Specified scene '{sceneName}' does not exist.", nameof(sceneName));
             }
 
+            var parentContext = sceneContextRegistry.TryGetSceneContextForScene(parent);
+
             try
             {
                 await SceneLoadMonitors.Load.AcquireLock();
 
                 bindings += container =>
                 {
-                    if (parent != null)
+                    if (parentContext != null)
                     {
-                        container.Bind<Scene>().WithId(ParentSceneId).To<Scene>().FromInstance(parent.gameObject.scene);
+                        container.Bind<Scene>().WithId(ParentSceneId).To<Scene>().FromInstance(parentContext.gameObject.scene);
                     }
                 };
 
-                AddSceneParentContainers(parent == null ? null : new[] { parent.Container });
+                AddSceneParentContainers(parentContext == null ? null : new[] { parentContext.Container });
                 AddSceneBindings(bindings);
 
                 var loadSceneParameters = new LoadSceneParameters(LoadSceneMode.Additive, localPhysicsMode);
@@ -146,22 +74,7 @@ namespace Exanite.SceneManagement
             }
         }
 
-        /// <summary>
-        /// Loads the <see cref="Scene"/> while unloading all other scenes.
-        /// </summary>
-        /// <param name="sceneName">
-        /// The name of the <see cref="Scene"/> to load.
-        /// </param>
-        /// <param name="localPhysicsMode">
-        /// Should this scene have its own physics simulation?
-        /// </param>
-        /// <param name="bindings">
-        /// Bindings to install to the <see cref="DiContainer"/>.
-        /// </param>
-        /// <returns>
-        /// The newly loaded <see cref="Scene"/>.
-        /// </returns>
-        public async UniTask<Scene> LoadSingleScene(
+        private async UniTask<Scene> LoadSingleScene(
             string sceneName,
             LocalPhysicsMode localPhysicsMode = LocalPhysicsMode.None,
             Action<DiContainer> bindings = null)
