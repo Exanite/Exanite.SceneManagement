@@ -1,6 +1,5 @@
 using System;
 using Cysharp.Threading.Tasks;
-using UniDi;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
@@ -24,11 +23,19 @@ namespace Exanite.SceneManagement.Identifiers
             set => localPhysicsMode = (InspectorLocalPhysicsMode)value;
         }
 
-        public override async UniTask<Scene> Load(LoadSceneMode loadMode)
+        public override async UniTask<Scene> Load(LoadSceneMode loadMode, Action<SceneLoadSettings> configureSettings)
         {
-            var sceneLoadManager = ProjectContext.Instance.Container.Resolve<SceneLoader>();
+            var settings = new SceneLoadSettings
+            {
+                SceneName = sceneName,
+                LoadMode = loadMode,
+                LocalPhysicsMode = LocalPhysicsMode,
+            };
 
-            var newScene = await sceneLoadManager.LoadScene(sceneName, loadMode, default, LocalPhysicsMode);
+            configureSettings?.Invoke(settings);
+
+            var newScene = await LoadScene(settings);
+
             var newSceneInitializer = SceneInitializerRegistry.SceneInitializers[newScene];
             Assert.AreEqual(this, newSceneInitializer.Identifier, "Loaded scene does not have expected scene identifier");
 
