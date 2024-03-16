@@ -5,20 +5,20 @@ namespace Exanite.SceneManagement
 {
     public class UniTaskMonitor
     {
-        private int pendingCount;
+        private int userCount;
         private bool isLocked;
 
         public int PendingCount
         {
-            get => pendingCount;
-            set => pendingCount = value;
+            get => userCount;
+            set => userCount = value;
         }
 
-        public bool HasPending => pendingCount != 0;
+        public bool HasUsers => userCount != 0;
 
         public async UniTask AcquireLock()
         {
-            pendingCount++;
+            userCount++;
             await UniTask.WaitWhile(() => isLocked);
             isLocked = true;
         }
@@ -31,7 +31,7 @@ namespace Exanite.SceneManagement
             }
 
             isLocked = false;
-            pendingCount--;
+            userCount--;
         }
     }
 }

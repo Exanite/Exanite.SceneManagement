@@ -20,7 +20,7 @@ namespace Exanite.SceneManagement
 
         [Inject] private SceneContextRegistry sceneContextRegistry;
 
-        public static bool IsLoading => SceneLoadMonitors.Load.HasPending;
+        public static bool IsLoading => SceneLoadMonitors.Load.HasUsers;
 
         public UniTask<Scene> LoadScene(SceneLoadSettings settings)
         {
