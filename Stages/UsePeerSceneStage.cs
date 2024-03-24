@@ -8,19 +8,15 @@ namespace Exanite.SceneManagement.Stages
     /// <summary>
     /// Gets an existing parent scene or loads it if it is not loaded.
     /// <para/>
-    /// Parent scenes are scenes that have to be loaded before this scene initializes.
-    /// This scene can then access DI bindings registered in the parent scene.
+    /// Peer scenes are scenes that have to be loaded before this scene initializes.
     /// </summary>
-    public class UseParentSceneStage : SceneLoadStage
+    public class UsePeerSceneStage : SceneLoadStage
     {
-        [SerializeField] private SceneIdentifier parentSceneIdentifier;
+        [SerializeField] private SceneIdentifier peerSceneIdentifier;
 
         public override async UniTask Load(Scene currentScene)
         {
-            var parentScene = await GetOrLoadScene(currentScene);
-            var sceneInitializer = SceneInitializerRegistry.SceneInitializers[currentScene];
-
-            sceneInitializer.AddParentSceneInitializer(parentScene);
+            await GetOrLoadScene(currentScene);
         }
 
         private async UniTask<SceneInitializer> GetOrLoadScene(Scene currentScene)
@@ -41,7 +37,7 @@ namespace Exanite.SceneManagement.Stages
             }
 
             // Otherwise, create a new parent
-            var parentScene = await parentSceneIdentifier.Load(LoadSceneMode.Additive);
+            var parentScene = await peerSceneIdentifier.Load(LoadSceneMode.Additive);
             var parentSceneInitializer = SceneInitializerRegistry.SceneInitializers[parentScene];
 
             return parentSceneInitializer;
@@ -49,7 +45,7 @@ namespace Exanite.SceneManagement.Stages
 
         protected virtual bool IsCompatibleScene(SceneInitializer scene)
         {
-            return scene.Identifier == parentSceneIdentifier;
+            return scene.Identifier == peerSceneIdentifier;
         }
     }
 }
