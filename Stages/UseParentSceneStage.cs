@@ -7,6 +7,9 @@ namespace Exanite.SceneManagement.Stages
 {
     /// <summary>
     /// Gets an existing parent scene or loads it if it is not loaded.
+    /// <para/>
+    /// Parent scenes are scenes that have to be loaded before this scene initializes.
+    /// This scene can then access DI bindings registered in the parent scene.
     /// </summary>
     public class UseParentSceneStage : SceneLoadStage
     {
