@@ -45,7 +45,7 @@ namespace Exanite.SceneManagement.Stages
 
         protected virtual bool IsCompatibleScene(SceneInitializer scene)
         {
-            return scene.Identifier == peerSceneIdentifier;
+            return scene.Identifiers.Find(identifier => identifier == peerSceneIdentifier);
         }
     }
 }

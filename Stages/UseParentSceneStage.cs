@@ -49,7 +49,7 @@ namespace Exanite.SceneManagement.Stages
 
         protected virtual bool IsCompatibleScene(SceneInitializer scene)
         {
-            return scene.Identifier == parentSceneIdentifier;
+            return scene.Identifiers.Find(identifier => identifier == parentSceneIdentifier);
         }
     }
 }

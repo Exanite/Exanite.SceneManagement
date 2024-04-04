@@ -12,13 +12,15 @@ using Sirenix.OdinInspector;
 namespace Exanite.SceneManagement
 {
     [DefaultExecutionOrder(-13000)]
-    public class SceneInitializer : MonoBehaviour
+    public class SceneInitializer : MonoBehaviour, ISerializationCallbackReceiver
     {
         [Header("Configuration")]
+        [HideInInspector]
+        [SerializeField] private SceneIdentifier identifier;
 #if ODIN_INSPECTOR
         [RequiredIn(PrefabKind.InstanceInScene | PrefabKind.NonPrefabInstance)]
 #endif
-        [SerializeField] private SceneIdentifier identifier;
+        [SerializeField] private List<SceneIdentifier> identifiers;
 #if ODIN_INSPECTOR
         [Required]
 #endif
@@ -40,11 +42,7 @@ namespace Exanite.SceneManagement
         private List<SceneInitializer> parentSceneInitializers = new();
         private List<SceneInitializer> pendingParentSceneInitializers = new();
 
-        public SceneIdentifier Identifier
-        {
-            get => identifier;
-            set => identifier = value;
-        }
+        public List<SceneIdentifier> Identifiers => identifiers;
 
         public SceneContext SceneContext
         {
@@ -224,6 +222,24 @@ namespace Exanite.SceneManagement
             }
 
             Destroy(sceneObjectsParent.gameObject);
+        }
+
+        void ISerializationCallbackReceiver.OnBeforeSerialize()
+        {
+            if (identifier)
+            {
+                identifiers.Add(identifier);
+                identifier = null;
+            }
+        }
+
+        void ISerializationCallbackReceiver.OnAfterDeserialize()
+        {
+            if (identifier)
+            {
+                identifiers.Add(identifier);
+                identifier = null;
+            }
         }
     }
 }
