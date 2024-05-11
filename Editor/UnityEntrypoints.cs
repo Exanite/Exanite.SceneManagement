@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UniDi;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -45,3 +46,4 @@ namespace Exanite.SceneManagement.Editor
         }
     }
 }
+#endif
