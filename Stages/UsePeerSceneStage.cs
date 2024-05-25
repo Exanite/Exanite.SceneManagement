@@ -2,7 +2,6 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 
 namespace Exanite.SceneManagement.Stages
 {
@@ -13,7 +12,6 @@ namespace Exanite.SceneManagement.Stages
     /// </summary>
     public class UsePeerSceneStage : SceneLoadStage
     {
-        [FormerlySerializedAs("parentSceneIdentifier")]
         [SerializeField] private SceneIdentifier peerSceneIdentifier;
 
         public override async UniTask Load(Scene currentScene)
