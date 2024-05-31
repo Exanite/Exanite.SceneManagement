@@ -283,6 +283,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   peerSceneIdentifier: {fileID: 11400000, guid: 8d2fc8c73e493684c8accd6ded648097,
     type: 2}
+  relationType: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
