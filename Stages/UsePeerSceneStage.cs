@@ -20,6 +20,30 @@ namespace Exanite.SceneManagement.Stages
         [SerializeField] protected bool requireScene = true;
         [SerializeField] protected bool createSceneIfDoesntExist = true;
 
+        public SceneIdentifier PeerSceneIdentifier
+        {
+            get => peerSceneIdentifier;
+            set => peerSceneIdentifier = value;
+        }
+
+        public SceneRelationType RelationType
+        {
+            get => relationType;
+            set => relationType = value;
+        }
+
+        public bool RequireScene
+        {
+            get => requireScene;
+            set => requireScene = value;
+        }
+
+        public bool CreateSceneIfDoesntExist
+        {
+            get => createSceneIfDoesntExist;
+            set => createSceneIfDoesntExist = value;
+        }
+
         public override async UniTask Load(Scene currentScene)
         {
             var currentSceneInitializer = SceneInitializerRegistry.SceneInitializers[currentScene];
