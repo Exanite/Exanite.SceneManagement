@@ -1,6 +1,6 @@
+using System;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using Exanite.Core.Utilities;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -16,47 +16,67 @@ namespace Exanite.SceneManagement.Stages
         [SerializeField] protected SceneIdentifier peerSceneIdentifier;
         [SerializeField] protected SceneRelationType relationType = SceneRelationType.Peer;
 
+        [Space]
+        [SerializeField] protected bool requireScene = true;
+        [SerializeField] protected bool createSceneIfDoesntExist = true;
+
         public override async UniTask Load(Scene currentScene)
         {
+            var currentSceneInitializer = SceneInitializerRegistry.SceneInitializers[currentScene];
+
+            SceneInitializer peerSceneInitializer;
+            var existingPeerScene = await TryGetExistingPeerScene(currentSceneInitializer);
+            if (existingPeerScene.Exists)
+            {
+                peerSceneInitializer = existingPeerScene.Initializer;
+            }
+            else
+            {
+                if (createSceneIfDoesntExist)
+                {
+                    peerSceneInitializer = await LoadPeerScene(currentSceneInitializer);
+                }
+                else
+                {
+                    if (requireScene)
+                    {
+                        throw new Exception("Failed to find existing scene that is suitable to be this scene's peer scene");
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+            }
+
             switch (relationType)
             {
-                case SceneRelationType.Peer:
-                {
-                    await GetOrLoadPeerScene(currentScene);
-
-                    break;
-                }
                 case SceneRelationType.Parent:
                 {
-                    var parentScene = await GetOrLoadPeerScene(currentScene);
-                    var sceneInitializer = SceneInitializerRegistry.SceneInitializers[currentScene];
-
-                    sceneInitializer.AddParentSceneInitializer(parentScene);
+                    currentSceneInitializer.AddParentSceneInitializer(peerSceneInitializer);
 
                     break;
                 }
-                default: throw ExceptionUtility.NotSupportedEnumValue(relationType);
             }
         }
 
-        private async UniTask<SceneInitializer> GetOrLoadPeerScene(Scene currentScene)
+        protected virtual async UniTask<(bool Exists, SceneInitializer Initializer)> TryGetExistingPeerScene(SceneInitializer currentScene)
         {
             // Wait for all scene load operations to complete
             await UniTask.WaitWhile(() => SceneLoader.IsLoading);
 
-            // Check to see if there are existing scenes compatible with being a peer of this scene
+            // Check if there are existing scenes compatible with being a peer of this scene
             var existingScene = SceneInitializerRegistry.SceneInitializers.FirstOrDefault(pair =>
                 {
-                    return IsCompatibleScene(pair.Value);
+                    return IsCompatiblePeerScene(pair.Value, currentScene);
                 })
                 .Value;
 
-            if (existingScene != null)
-            {
-                return existingScene;
-            }
+            return (existingScene != null, existingScene);
+        }
 
-            // Otherwise, create a new peer
+        protected virtual async UniTask<SceneInitializer> LoadPeerScene(SceneInitializer currentScene)
+        {
             var peerScene = await peerSceneIdentifier.Load(LoadSceneMode.Additive);
             var peerSceneInitializer = SceneInitializerRegistry.SceneInitializers[peerScene];
 
