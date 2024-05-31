@@ -278,11 +278,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 2014482300}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5df7b520feec44708e6becb8ba50697f, type: 3}
+  m_Script: {fileID: 11500000, guid: 772f3a0df4854f9f897837b1dc32e33e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   peerSceneIdentifier: {fileID: 11400000, guid: 453d700f1fc82614ebd4b5e564454077,
     type: 2}
+  relationType: 1
+  requireScene: 1
+  createSceneIfDoesntExist: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
