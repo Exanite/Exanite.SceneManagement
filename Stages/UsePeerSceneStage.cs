@@ -10,7 +10,7 @@ namespace Exanite.SceneManagement.Stages
     /// <para/>
     /// Peer scenes are scenes that have to be loaded before this scene initializes.
     /// </summary>
-    public class UsePeerSceneStage : SceneLoadStage, ISerializationCallbackReceiver
+    public class UsePeerSceneStage : SceneLoadStage
     {
         [SerializeField] protected SceneIdentifier peerSceneIdentifier;
         [SerializeField] protected SceneRelationType relationType = SceneRelationType.Peer;
@@ -53,12 +53,5 @@ namespace Exanite.SceneManagement.Stages
         {
             return scene.Identifiers.Find(identifier => identifier == peerSceneIdentifier);
         }
-
-        public virtual void OnBeforeSerialize()
-        {
-            relationType = SceneRelationType.Peer;
-        }
-
-        public virtual void OnAfterDeserialize() {}
     }
 }
