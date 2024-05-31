@@ -20,5 +20,12 @@ namespace Exanite.SceneManagement.Stages
 
             return parentScene;
         }
+
+        public override void OnBeforeSerialize()
+        {
+            base.OnBeforeSerialize();
+
+            relationType = SceneRelationType.Parent;
+        }
     }
 }
